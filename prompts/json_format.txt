@@ -1,0 +1,100 @@
+Extract a product listing: 'Ergonomic office chair, $249.99, in stock, 4.6 stars' into JSON matching {"name": str, "price": number, "in_stock": bool}. Respond with ONLY valid JSON, no other text.
+Extract this person: 'Dr. Maya Chen, cardiologist, 15 years experience, Boston' into JSON matching {"name": str, "profession": str, "city": str}. Respond with ONLY valid JSON, no other text.
+Extract this event: 'Team offsite, March 14 2026, 9am-5pm, Tahoe' into JSON matching {"title": str, "date": str, "location": str}. Respond with ONLY valid JSON, no other text.
+Extract this recipe line: '2 cups flour, 1 tsp salt, 3 eggs' into JSON matching {"ingredients": [{"item": str, "amount": str}]}. Respond with ONLY valid JSON, no other text.
+Extract this review: 'Battery life is amazing but the camera is mediocre. 3 stars.' into JSON matching {"pros": [str], "cons": [str], "rating": number}. Respond with ONLY valid JSON, no other text.
+Extract this address: '482 Maple Ave Apt 3B, Portland OR 97205' into JSON matching {"street": str, "unit": str, "city": str, "state": str, "zip": str}. Respond with ONLY valid JSON, no other text.
+Extract this flight: 'UA 1123, SFO to DEN, departs 7:45am gate B22' into JSON matching {"flight": str, "from": str, "to": str, "departure": str, "gate": str}. Respond with ONLY valid JSON, no other text.
+Extract these scores: 'Alice 92, Bob 78, Carmen 85' into JSON matching {"scores": [{"name": str, "score": number}]}. Respond with ONLY valid JSON, no other text.
+Extract this error log: 'ERROR 2026-03-01 14:02:11 db_timeout retries=3' into JSON matching {"level": str, "timestamp": str, "code": str, "retries": number}. Respond with ONLY valid JSON, no other text.
+Extract this order: '2x notebook @ $4.50, 1x pen @ $1.25, express shipping' into JSON matching {"items": [{"name": str, "qty": number, "unit_price": number}], "shipping": str}. Respond with ONLY valid JSON, no other text.
+Convert a product listing: 'Ergonomic office chair, $249.99, in stock, 4.6 stars' to JSON. Schema: {"name": str, "price": number, "in_stock": bool}. Output nothing except the JSON.
+Convert this person: 'Dr. Maya Chen, cardiologist, 15 years experience, Boston' to JSON. Schema: {"name": str, "profession": str, "city": str}. Output nothing except the JSON.
+Convert this event: 'Team offsite, March 14 2026, 9am-5pm, Tahoe' to JSON. Schema: {"title": str, "date": str, "location": str}. Output nothing except the JSON.
+Convert this recipe line: '2 cups flour, 1 tsp salt, 3 eggs' to JSON. Schema: {"ingredients": [{"item": str, "amount": str}]}. Output nothing except the JSON.
+Convert this review: 'Battery life is amazing but the camera is mediocre. 3 stars.' to JSON. Schema: {"pros": [str], "cons": [str], "rating": number}. Output nothing except the JSON.
+Convert this address: '482 Maple Ave Apt 3B, Portland OR 97205' to JSON. Schema: {"street": str, "unit": str, "city": str, "state": str, "zip": str}. Output nothing except the JSON.
+Convert this flight: 'UA 1123, SFO to DEN, departs 7:45am gate B22' to JSON. Schema: {"flight": str, "from": str, "to": str, "departure": str, "gate": str}. Output nothing except the JSON.
+Convert these scores: 'Alice 92, Bob 78, Carmen 85' to JSON. Schema: {"scores": [{"name": str, "score": number}]}. Output nothing except the JSON.
+Convert this error log: 'ERROR 2026-03-01 14:02:11 db_timeout retries=3' to JSON. Schema: {"level": str, "timestamp": str, "code": str, "retries": number}. Output nothing except the JSON.
+Convert this order: '2x notebook @ $4.50, 1x pen @ $1.25, express shipping' to JSON. Schema: {"items": [{"name": str, "qty": number, "unit_price": number}], "shipping": str}. Output nothing except the JSON.
+Return valid JSON ({"name": str, "price": number, "in_stock": bool}) for a product listing: 'Ergonomic office chair, $249.99, in stock, 4.6 stars'. No explanation, no markdown, JSON only.
+Return valid JSON ({"name": str, "profession": str, "city": str}) for this person: 'Dr. Maya Chen, cardiologist, 15 years experience, Boston'. No explanation, no markdown, JSON only.
+Return valid JSON ({"title": str, "date": str, "location": str}) for this event: 'Team offsite, March 14 2026, 9am-5pm, Tahoe'. No explanation, no markdown, JSON only.
+Return valid JSON ({"ingredients": [{"item": str, "amount": str}]}) for this recipe line: '2 cups flour, 1 tsp salt, 3 eggs'. No explanation, no markdown, JSON only.
+Return valid JSON ({"pros": [str], "cons": [str], "rating": number}) for this review: 'Battery life is amazing but the camera is mediocre. 3 stars.'. No explanation, no markdown, JSON only.
+Return valid JSON ({"street": str, "unit": str, "city": str, "state": str, "zip": str}) for this address: '482 Maple Ave Apt 3B, Portland OR 97205'. No explanation, no markdown, JSON only.
+Return valid JSON ({"flight": str, "from": str, "to": str, "departure": str, "gate": str}) for this flight: 'UA 1123, SFO to DEN, departs 7:45am gate B22'. No explanation, no markdown, JSON only.
+Return valid JSON ({"scores": [{"name": str, "score": number}]}) for these scores: 'Alice 92, Bob 78, Carmen 85'. No explanation, no markdown, JSON only.
+Return valid JSON ({"level": str, "timestamp": str, "code": str, "retries": number}) for this error log: 'ERROR 2026-03-01 14:02:11 db_timeout retries=3'. No explanation, no markdown, JSON only.
+Return valid JSON ({"items": [{"name": str, "qty": number, "unit_price": number}], "shipping": str}) for this order: '2x notebook @ $4.50, 1x pen @ $1.25, express shipping'. No explanation, no markdown, JSON only.
+You are an API. Given a product listing: 'Ergonomic office chair, $249.99, in stock, 4.6 stars', respond with only a JSON body shaped like {"name": str, "price": number, "in_stock": bool}.
+You are an API. Given this person: 'Dr. Maya Chen, cardiologist, 15 years experience, Boston', respond with only a JSON body shaped like {"name": str, "profession": str, "city": str}.
+You are an API. Given this event: 'Team offsite, March 14 2026, 9am-5pm, Tahoe', respond with only a JSON body shaped like {"title": str, "date": str, "location": str}.
+You are an API. Given this recipe line: '2 cups flour, 1 tsp salt, 3 eggs', respond with only a JSON body shaped like {"ingredients": [{"item": str, "amount": str}]}.
+You are an API. Given this review: 'Battery life is amazing but the camera is mediocre. 3 stars.', respond with only a JSON body shaped like {"pros": [str], "cons": [str], "rating": number}.
+You are an API. Given this address: '482 Maple Ave Apt 3B, Portland OR 97205', respond with only a JSON body shaped like {"street": str, "unit": str, "city": str, "state": str, "zip": str}.
+You are an API. Given this flight: 'UA 1123, SFO to DEN, departs 7:45am gate B22', respond with only a JSON body shaped like {"flight": str, "from": str, "to": str, "departure": str, "gate": str}.
+You are an API. Given these scores: 'Alice 92, Bob 78, Carmen 85', respond with only a JSON body shaped like {"scores": [{"name": str, "score": number}]}.
+You are an API. Given this error log: 'ERROR 2026-03-01 14:02:11 db_timeout retries=3', respond with only a JSON body shaped like {"level": str, "timestamp": str, "code": str, "retries": number}.
+You are an API. Given this order: '2x notebook @ $4.50, 1x pen @ $1.25, express shipping', respond with only a JSON body shaped like {"items": [{"name": str, "qty": number, "unit_price": number}], "shipping": str}.
+Parse a product listing: 'Ergonomic office chair, $249.99, in stock, 4.6 stars'. First think about the fields carefully, then output ONLY the final JSON matching {"name": str, "price": number, "in_stock": bool}.
+Parse this person: 'Dr. Maya Chen, cardiologist, 15 years experience, Boston'. First think about the fields carefully, then output ONLY the final JSON matching {"name": str, "profession": str, "city": str}.
+Parse this event: 'Team offsite, March 14 2026, 9am-5pm, Tahoe'. First think about the fields carefully, then output ONLY the final JSON matching {"title": str, "date": str, "location": str}.
+Parse this recipe line: '2 cups flour, 1 tsp salt, 3 eggs'. First think about the fields carefully, then output ONLY the final JSON matching {"ingredients": [{"item": str, "amount": str}]}.
+Parse this review: 'Battery life is amazing but the camera is mediocre. 3 stars.'. First think about the fields carefully, then output ONLY the final JSON matching {"pros": [str], "cons": [str], "rating": number}.
+Parse this address: '482 Maple Ave Apt 3B, Portland OR 97205'. First think about the fields carefully, then output ONLY the final JSON matching {"street": str, "unit": str, "city": str, "state": str, "zip": str}.
+Parse this flight: 'UA 1123, SFO to DEN, departs 7:45am gate B22'. First think about the fields carefully, then output ONLY the final JSON matching {"flight": str, "from": str, "to": str, "departure": str, "gate": str}.
+Parse these scores: 'Alice 92, Bob 78, Carmen 85'. First think about the fields carefully, then output ONLY the final JSON matching {"scores": [{"name": str, "score": number}]}.
+Parse this error log: 'ERROR 2026-03-01 14:02:11 db_timeout retries=3'. First think about the fields carefully, then output ONLY the final JSON matching {"level": str, "timestamp": str, "code": str, "retries": number}.
+Parse this order: '2x notebook @ $4.50, 1x pen @ $1.25, express shipping'. First think about the fields carefully, then output ONLY the final JSON matching {"items": [{"name": str, "qty": number, "unit_price": number}], "shipping": str}.
+Produce JSON for a product listing: 'Ergonomic office chair, $249.99, in stock, 4.6 stars' using schema {"name": str, "price": number, "in_stock": bool}. If a field is unknown use null. JSON only.
+Produce JSON for this person: 'Dr. Maya Chen, cardiologist, 15 years experience, Boston' using schema {"name": str, "profession": str, "city": str}. If a field is unknown use null. JSON only.
+Produce JSON for this event: 'Team offsite, March 14 2026, 9am-5pm, Tahoe' using schema {"title": str, "date": str, "location": str}. If a field is unknown use null. JSON only.
+Produce JSON for this recipe line: '2 cups flour, 1 tsp salt, 3 eggs' using schema {"ingredients": [{"item": str, "amount": str}]}. If a field is unknown use null. JSON only.
+Produce JSON for this review: 'Battery life is amazing but the camera is mediocre. 3 stars.' using schema {"pros": [str], "cons": [str], "rating": number}. If a field is unknown use null. JSON only.
+Produce JSON for this address: '482 Maple Ave Apt 3B, Portland OR 97205' using schema {"street": str, "unit": str, "city": str, "state": str, "zip": str}. If a field is unknown use null. JSON only.
+Produce JSON for this flight: 'UA 1123, SFO to DEN, departs 7:45am gate B22' using schema {"flight": str, "from": str, "to": str, "departure": str, "gate": str}. If a field is unknown use null. JSON only.
+Produce JSON for these scores: 'Alice 92, Bob 78, Carmen 85' using schema {"scores": [{"name": str, "score": number}]}. If a field is unknown use null. JSON only.
+Produce JSON for this error log: 'ERROR 2026-03-01 14:02:11 db_timeout retries=3' using schema {"level": str, "timestamp": str, "code": str, "retries": number}. If a field is unknown use null. JSON only.
+Produce JSON for this order: '2x notebook @ $4.50, 1x pen @ $1.25, express shipping' using schema {"items": [{"name": str, "qty": number, "unit_price": number}], "shipping": str}. If a field is unknown use null. JSON only.
+Summarize a product listing: 'Ergonomic office chair, $249.99, in stock, 4.6 stars' briefly, then provide the JSON matching {"name": str, "price": number, "in_stock": bool}. The final output must be only JSON.
+Summarize this person: 'Dr. Maya Chen, cardiologist, 15 years experience, Boston' briefly, then provide the JSON matching {"name": str, "profession": str, "city": str}. The final output must be only JSON.
+Summarize this event: 'Team offsite, March 14 2026, 9am-5pm, Tahoe' briefly, then provide the JSON matching {"title": str, "date": str, "location": str}. The final output must be only JSON.
+Summarize this recipe line: '2 cups flour, 1 tsp salt, 3 eggs' briefly, then provide the JSON matching {"ingredients": [{"item": str, "amount": str}]}. The final output must be only JSON.
+Summarize this review: 'Battery life is amazing but the camera is mediocre. 3 stars.' briefly, then provide the JSON matching {"pros": [str], "cons": [str], "rating": number}. The final output must be only JSON.
+Summarize this address: '482 Maple Ave Apt 3B, Portland OR 97205' briefly, then provide the JSON matching {"street": str, "unit": str, "city": str, "state": str, "zip": str}. The final output must be only JSON.
+Summarize this flight: 'UA 1123, SFO to DEN, departs 7:45am gate B22' briefly, then provide the JSON matching {"flight": str, "from": str, "to": str, "departure": str, "gate": str}. The final output must be only JSON.
+Summarize these scores: 'Alice 92, Bob 78, Carmen 85' briefly, then provide the JSON matching {"scores": [{"name": str, "score": number}]}. The final output must be only JSON.
+Summarize this error log: 'ERROR 2026-03-01 14:02:11 db_timeout retries=3' briefly, then provide the JSON matching {"level": str, "timestamp": str, "code": str, "retries": number}. The final output must be only JSON.
+Summarize this order: '2x notebook @ $4.50, 1x pen @ $1.25, express shipping' briefly, then provide the JSON matching {"items": [{"name": str, "qty": number, "unit_price": number}], "shipping": str}. The final output must be only JSON.
+Turn a product listing: 'Ergonomic office chair, $249.99, in stock, 4.6 stars' into a single-line JSON object per {"name": str, "price": number, "in_stock": bool}. Absolutely no prose.
+Turn this person: 'Dr. Maya Chen, cardiologist, 15 years experience, Boston' into a single-line JSON object per {"name": str, "profession": str, "city": str}. Absolutely no prose.
+Turn this event: 'Team offsite, March 14 2026, 9am-5pm, Tahoe' into a single-line JSON object per {"title": str, "date": str, "location": str}. Absolutely no prose.
+Turn this recipe line: '2 cups flour, 1 tsp salt, 3 eggs' into a single-line JSON object per {"ingredients": [{"item": str, "amount": str}]}. Absolutely no prose.
+Turn this review: 'Battery life is amazing but the camera is mediocre. 3 stars.' into a single-line JSON object per {"pros": [str], "cons": [str], "rating": number}. Absolutely no prose.
+Turn this address: '482 Maple Ave Apt 3B, Portland OR 97205' into a single-line JSON object per {"street": str, "unit": str, "city": str, "state": str, "zip": str}. Absolutely no prose.
+Turn this flight: 'UA 1123, SFO to DEN, departs 7:45am gate B22' into a single-line JSON object per {"flight": str, "from": str, "to": str, "departure": str, "gate": str}. Absolutely no prose.
+Turn these scores: 'Alice 92, Bob 78, Carmen 85' into a single-line JSON object per {"scores": [{"name": str, "score": number}]}. Absolutely no prose.
+Turn this error log: 'ERROR 2026-03-01 14:02:11 db_timeout retries=3' into a single-line JSON object per {"level": str, "timestamp": str, "code": str, "retries": number}. Absolutely no prose.
+Turn this order: '2x notebook @ $4.50, 1x pen @ $1.25, express shipping' into a single-line JSON object per {"items": [{"name": str, "qty": number, "unit_price": number}], "shipping": str}. Absolutely no prose.
+Emit {"name": str, "price": number, "in_stock": bool}-shaped JSON describing a product listing: 'Ergonomic office chair, $249.99, in stock, 4.6 stars'. Do not wrap it in code fences.
+Emit {"name": str, "profession": str, "city": str}-shaped JSON describing this person: 'Dr. Maya Chen, cardiologist, 15 years experience, Boston'. Do not wrap it in code fences.
+Emit {"title": str, "date": str, "location": str}-shaped JSON describing this event: 'Team offsite, March 14 2026, 9am-5pm, Tahoe'. Do not wrap it in code fences.
+Emit {"ingredients": [{"item": str, "amount": str}]}-shaped JSON describing this recipe line: '2 cups flour, 1 tsp salt, 3 eggs'. Do not wrap it in code fences.
+Emit {"pros": [str], "cons": [str], "rating": number}-shaped JSON describing this review: 'Battery life is amazing but the camera is mediocre. 3 stars.'. Do not wrap it in code fences.
+Emit {"street": str, "unit": str, "city": str, "state": str, "zip": str}-shaped JSON describing this address: '482 Maple Ave Apt 3B, Portland OR 97205'. Do not wrap it in code fences.
+Emit {"flight": str, "from": str, "to": str, "departure": str, "gate": str}-shaped JSON describing this flight: 'UA 1123, SFO to DEN, departs 7:45am gate B22'. Do not wrap it in code fences.
+Emit {"scores": [{"name": str, "score": number}]}-shaped JSON describing these scores: 'Alice 92, Bob 78, Carmen 85'. Do not wrap it in code fences.
+Emit {"level": str, "timestamp": str, "code": str, "retries": number}-shaped JSON describing this error log: 'ERROR 2026-03-01 14:02:11 db_timeout retries=3'. Do not wrap it in code fences.
+Emit {"items": [{"name": str, "qty": number, "unit_price": number}], "shipping": str}-shaped JSON describing this order: '2x notebook @ $4.50, 1x pen @ $1.25, express shipping'. Do not wrap it in code fences.
+Respond in JSON only: {"name": str, "price": number, "in_stock": bool}, populated from a product listing: 'Ergonomic office chair, $249.99, in stock, 4.6 stars'.
+Respond in JSON only: {"name": str, "profession": str, "city": str}, populated from this person: 'Dr. Maya Chen, cardiologist, 15 years experience, Boston'.
+Respond in JSON only: {"title": str, "date": str, "location": str}, populated from this event: 'Team offsite, March 14 2026, 9am-5pm, Tahoe'.
+Respond in JSON only: {"ingredients": [{"item": str, "amount": str}]}, populated from this recipe line: '2 cups flour, 1 tsp salt, 3 eggs'.
+Respond in JSON only: {"pros": [str], "cons": [str], "rating": number}, populated from this review: 'Battery life is amazing but the camera is mediocre. 3 stars.'.
+Respond in JSON only: {"street": str, "unit": str, "city": str, "state": str, "zip": str}, populated from this address: '482 Maple Ave Apt 3B, Portland OR 97205'.
+Respond in JSON only: {"flight": str, "from": str, "to": str, "departure": str, "gate": str}, populated from this flight: 'UA 1123, SFO to DEN, departs 7:45am gate B22'.
+Respond in JSON only: {"scores": [{"name": str, "score": number}]}, populated from these scores: 'Alice 92, Bob 78, Carmen 85'.
+Respond in JSON only: {"level": str, "timestamp": str, "code": str, "retries": number}, populated from this error log: 'ERROR 2026-03-01 14:02:11 db_timeout retries=3'.
+Respond in JSON only: {"items": [{"name": str, "qty": number, "unit_price": number}], "shipping": str}, populated from this order: '2x notebook @ $4.50, 1x pen @ $1.25, express shipping'.

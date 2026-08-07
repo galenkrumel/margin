@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Margin — precision-targeted measurement</title>
+<style>
+  /* Dark-committed stage console. Palette: validated dataviz reference (dark steps). */
+  :root {
+    color-scheme: dark;
+    --page:      #0d0d0d;
+    --surface:   #1a1a19;
+    --ink:       #ffffff;
+    --ink-2:     #c3c2b7;
+    --muted:     #898781;
+    --grid:      #2c2c2a;
+    --baseline:  #383835;
+    --border:    rgba(255,255,255,0.10);
+    --accent:    #3987e5;   /* series slot 1 (dark) */
+    --accent-dim:#1c5cab;
+    --deemph:    #52514e;   /* context series */
+    --good:      #0ca30c;
+    --warning:   #fab219;
+    --serious:   #ec835a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--page); color: var(--ink);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 40px 32px 80px;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; }
+
+  header { display: flex; align-items: baseline; gap: 16px; margin-bottom: 6px; }
+  .wordmark { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+  .wordmark::after { content: "_"; color: var(--accent); }
+  .tagline { color: var(--muted); font-size: 14px; }
+  .subhead { color: var(--ink-2); font-size: 14px; margin-bottom: 28px; }
+
+  /* ---- jobs list (home) ---- */
+  h2 { font-size: 13px; font-weight: 600; text-transform: uppercase;
+       letter-spacing: 0.08em; color: var(--muted); margin: 34px 0 12px; }
+  table { width: 100%; border-collapse: collapse; }
+  .jobs th { text-align: left; font-size: 12px; font-weight: 500; color: var(--muted);
+             padding: 6px 14px; border-bottom: 1px solid var(--baseline); }
+  .jobs td { padding: 13px 14px; border-bottom: 1px solid var(--grid);
+             font-variant-numeric: tabular-nums; }
+  .jobs tr.row, .jobs tr.liverow { cursor: pointer; }
+  .jobs tr.row:hover td, .jobs tr.liverow:hover td { background: var(--surface); }
+  .jobs tr.sel td { background: var(--surface); }
+  .jobs tr.sel td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+  .jobs .metric { font-weight: 600; color: var(--ink); }
+  .jobs .desc { color: var(--muted); font-size: 12.5px; font-weight: 400; }
+  .num { text-align: right; }
+  .est { font-weight: 600; }
+  .ci { color: var(--ink-2); font-size: 13px; }
+  tr.suppressed td { color: var(--muted); }
+  tr.suppressed .metric { color: var(--muted); font-weight: 500; }
+  /* metric groups: a repeated metric collapses behind its newest run */
+  tbody.stack:not(.open) tr.jrow { display: none; }
+  tr.ghead { cursor: pointer; }
+  tr.ghead:hover td { background: var(--surface); }
+  tr.ghead .metric::before { content: "\25b8  "; color: var(--muted); font-size: 11px; }
+  tbody.stack.open tr.ghead .metric::before { content: "\25be  "; }
+  tbody.stack.open tr.jrow td:first-child { padding-left: 32px; }
+  tbody.stack.open tr.ghead td { border-bottom-color: var(--baseline); }
+
+  .tip { border-bottom: 1px dotted var(--muted); cursor: help; position: relative; }
+  .tip:hover::after, .tip:focus::after {
+    content: attr(data-tip); position: absolute; left: 0; top: calc(100% + 8px);
+    z-index: 20; width: 270px; background: var(--page);
+    border: 1px solid var(--baseline); border-radius: 8px; padding: 10px 12px;
+    font-size: 12.5px; font-weight: 400; line-height: 1.45; color: var(--ink-2);
+    text-transform: none; letter-spacing: normal; white-space: normal; text-align: left; }
+  .tip.r:hover::after, .tip.r:focus::after { left: auto; right: 0; }
+
+  .cellsub { color: var(--muted); font-size: 12px; font-weight: 400; margin-top: 1px; }
+  .tablenote { color: var(--muted); font-size: 12.5px; margin-top: 10px; }
+  .tablenote b { color: var(--ink-2); font-weight: 600; }
+
+  .kv td:first-child { color: var(--muted); width: 210px; }
+  .mono { font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
+          padding: 2px 9px; border-radius: 999px; border: 1px solid var(--border);
+          color: var(--ink-2); white-space: nowrap; }
+  .chip .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .chip.good .dot { background: var(--good); }
+  .chip.warn .dot { background: var(--warning); }
+  .chip.info .dot { background: var(--muted); }
+
+  /* ---- live job launcher (renders only when served by the API) ---- */
+  input, textarea, select {
+    font: inherit; color: var(--ink); background: var(--page);
+    border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+  textarea { width: 100%; resize: vertical; }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+  input[type=checkbox] { width: auto; accent-color: var(--accent); }
+  .field label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
+  button { font: inherit; font-weight: 600; color: #fff; background: var(--accent);
+           border: 0; border-radius: 8px; padding: 9px 18px; cursor: pointer; }
+  button:disabled { background: var(--deemph); cursor: default; }
+  .formrow { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; margin-top: 12px; }
+
+  /* ---- drill-down ---- */
+  #drill { margin-top: 8px; }
+  .panel { background: var(--surface); border: 1px solid var(--border);
+           border-radius: 10px; padding: 22px 24px; margin-top: 16px; }
+  .panel h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .panel .sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+           gap: 12px; margin-top: 16px; }
+  .tile { background: var(--surface); border: 1px solid var(--border);
+          border-radius: 10px; padding: 16px 18px; }
+  .tile .label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .tile .value { font-size: 30px; font-weight: 650; letter-spacing: -0.01em; }
+  .tile .value.hero { font-size: 48px; }
+  .tile .note { font-size: 12.5px; color: var(--ink-2); margin-top: 2px; }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+  @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } }
+
+  .chart { width: 100%; }
+
+  /* receipts + price list */
+  .fintab td, .fintab th { padding: 8px 12px; font-variant-numeric: tabular-nums; }
+  .fintab th { text-align: left; font-size: 12px; font-weight: 500; color: var(--muted);
+               border-bottom: 1px solid var(--baseline); }
+  .fintab td { border-bottom: 1px solid var(--grid); color: var(--ink-2); }
+  .fintab td.num, .fintab th.num { text-align: right; }
+  .fintab tr.hl td { color: var(--ink); font-weight: 600; background: rgba(57,135,229,0.08); }
+  .fintab tr.dead td { color: var(--muted); }
+  .fintab .total td { border-top: 1px solid var(--baseline); border-bottom: none;
+                      color: var(--ink); font-weight: 600; }
+
+  details { border: 1px solid var(--border); border-radius: 8px; margin-top: 10px; }
+  summary { cursor: pointer; padding: 10px 14px; font-size: 13.5px; color: var(--ink-2);
+            list-style: none; display: flex; gap: 10px; align-items: baseline; }
+  summary::before { content: "▸"; color: var(--muted); font-size: 11px; }
+  details[open] summary::before { content: "▾"; }
+  summary .q { font-weight: 600; color: var(--ink); }
+  .resp { padding: 4px 16px 14px 30px; color: var(--ink-2); font-size: 13.5px;
+          white-space: pre-wrap; border-top: 1px solid var(--grid); }
+  .respmeta { font-size: 12px; color: var(--muted); padding: 8px 16px 0 30px; }
+
+  .memtag { color: var(--accent); }
+
+  .footnote { color: var(--muted); font-size: 12.5px; margin-top: 30px;
+              border-top: 1px solid var(--grid); padding-top: 14px; }
+  .footnote b { color: var(--ink-2); font-weight: 600; }
+</style>
+<script>/*__PLOTLY__*/</script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="wordmark">margin</div>
+    <div class="tagline">state what you want to know — we find N</div>
+  </header>
+  <div class="subhead">Precision-targeted measurement for stochastic systems.
+    Submit a prompt population, a metric, and a precision target with a budget cap;
+    the engine runs the minimum executions, scores every response, and reports the
+    estimate, the achieved confidence interval, and the bill.</div>
+
+  <div id="launch"></div>
+
+  <h2>Jobs</h2>
+  <table class="jobs" id="jobs-table">
+    <thead><tr>
+      <th>Metric</th>
+      <th class="num"><span class="tip r" data-tip="Share of scored responses where the metric came back true — the best estimate of the true rate. The count underneath shows exactly what was tallied.">Measured rate</span></th>
+      <th class="num"><span class="tip r" data-tip="We're 95% confident the true rate lies inside this range; ±pts is its half-width. Margin keeps sampling until the range is narrower than your precision target.">95% CI</span></th>
+      <th class="num"><span class="tip r" data-tip="Where the adaptive stopping rule reached target precision — a live job stops and bills here. These validation runs executed the whole population ('of N') so the rule could be checked against ground truth.">Executions</span></th>
+      <th class="num"><span class="tip r" data-tip="What Margin bills: spend up to the adaptive stop. Underneath, what a fixed-N pipeline running the full population every time would pay.">Spend</span></th>
+      <th>Status</th>
+    </tr></thead>
+  </table>
+  <div class="tablenote">Validation runs: every prompt in each population was executed once
+    so the stopping rule could be verified against ground truth. <b>Executions</b> shows
+    where a live Margin job would have stopped — <b>Spend</b>, what it would have billed.</div>
+
+  <div id="drill"></div>
+
+  <div id="memory"></div>
+
+  <div class="footnote">
+    Intervals are Wilson score, 95%. Stopping decisions are evaluated after each
+    scored batch of <span id="fn-batch"></span>; sequential stopping without
+    correction inflates error rates slightly (<b>named, not hidden</b> — production
+    uses corrected sequential bounds). Judge is gpt-4o-mini at temperature 0,
+    validated against deterministic string matching. Every number on this page is
+    computed from completed measured runs on disk — nothing is simulated.
+  </div>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+
+const C = getComputedStyle(document.documentElement);
+const col = n => C.getPropertyValue(n).trim();
+const pct = (x, d=1) => (100*x).toFixed(d) + '%';
+const pts = w => '±' + (50*w).toFixed(1) + 'pts';
+// sub-cent jobs are the point of the product: never round a real spend to $0.00
+const usd = (x, d) => '$' + x.toFixed(d ?? (x < 0.05 ? 4 : 2));
+
+const BASE_LAYOUT = {
+  paper_bgcolor: col('--surface'), plot_bgcolor: col('--surface'),
+  font: {family: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+         size: 12, color: col('--ink-2')},
+  margin: {l: 52, r: 16, t: 8, b: 40},
+  xaxis: {gridcolor: col('--grid'), zeroline: false, linecolor: col('--baseline')},
+  yaxis: {gridcolor: col('--grid'), zeroline: false, linecolor: col('--baseline')},
+  showlegend: false, hovermode: 'x unified',
+  hoverlabel: {bgcolor: col('--page'), bordercolor: col('--baseline'),
+               font: {color: col('--ink-2')}},
+};
+const PLOT_CFG = {displayModeBar: false, responsive: true};
+
+const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+function statusChip(j) {
+  if (j.met) return `<span class="chip good"><span class="dot"></span>precision met</span>`;
+  return `<span class="chip warn"><span class="dot"></span>population exhausted</span>`;
+}
+
+/* ---------------- jobs list ----------------
+   One row builder for curated and live jobs alike: each entry carries its six
+   cells, so a metric group's header row is just its newest run's cells with a
+   different first column. Groups sort by newest run; curated runs predate every
+   live one, so they keep their curated order underneath. */
+const JOB_TD = ['', 'num', 'num ci', 'num', 'num', ''];
+const jobRow = (attrs, cells) =>
+  `<tr ${attrs}>${cells.map((c, i) => `<td class="${JOB_TD[i]}">${c}</td>`).join('')}</tr>`;
+
+const cell0 = (metric, desc, sub) =>
+  `<div class="metric">${metric}</div><div class="desc">${desc}</div>`
+  + (sub ? `<div class="cellsub">${sub}</div>` : '');
+
+function curatedItem(j, i) {
+  const spend = j.stop < j.n
+    ? `<div class="est">${usd(j.cost_at_stop)}</div><div class="cellsub">fixed-N ${usd(j.cost)}</div>`
+    : `<div class="est">${usd(j.cost)}</div><div class="cellsub">= fixed-N</div>`;
+  return {metric: j.metric, ts: -i, desc: j.description,   // curated: no clock, keep hero first
+    attrs: `class="row jrow" id="row-${i}" onclick="select(${i})"`,
+    cells: [
+      cell0(j.metric, j.description,
+            `measured: ${j.model}${j.search ? ' + web search' : ''}${memBadge(j.id)}`),
+      `<div class="est">${pct(j.estimate)}</div><div class="cellsub">${j.k} of ${j.n} true</div>`,
+      `${pct(j.lo)} – ${pct(j.hi)} <span style="color:var(--muted)">(${pts(j.width)})</span>`,
+      `<div class="est">${j.met ? j.stop : j.n}</div><div class="cellsub">of ${j.pop} run</div>`,
+      spend, statusChip(j)]};
+}
+
+function liveItem(s) {
+  const metric = esc(s.requested.metric.name || 'live job');
+  const desc = `live job · ${s.id}`;
+  return {metric, desc, sup: false,
+    ts: 1e6 + (+String(s.id).split('_')[1] || 0),   // live_<epoch>: newest live run wins
+    attrs: `class="row liverow jrow" id="liverow-${s.id}" onclick="pollJob('${s.id}')"`,
+    cells: [
+      cell0(metric, desc, `measured: ${esc(s.requested.measured.model)}${s.requested.measured.web_search ? ' + web search' : ''}${memBadge(s.id)}`),
+      s.estimate != null
+        ? `<div class="est">${pct(s.estimate)}</div><div class="cellsub">${s.k} of ${s.executions_used} true</div>` : '—',
+      s.ci ? `${pct(s.ci[0])} – ${pct(s.ci[1])} <span style="color:var(--muted)">(${pts(s.ci_width)}
+               · target ${pts(s.requested.precision.ci_width)})</span>` : '—',
+      `<div class="est">${s.executions_used || 0}</div>
+       <div class="cellsub">of ${s.population} submitted</div>`,
+      usdSmart(s.cost_usd || 0), ljChip(s)]};
+}
+
+function suppressedItem() {
+  const s = DATA.suppressed;
+  const desc = `branded + unbranded prompts blended into one population — the blended rate
+    depends on the arbitrary mix, so Margin withholds the headline and splits it into the
+    two jobs above instead`;
+  return {metric: s.metric, ts: -1e6, desc, sup: true, attrs: 'class="suppressed jrow"',
+    cells: [cell0(s.metric, desc, ''), '—<div class="cellsub">mix-dependent</div>', '—',
+      `<div class="est">${s.n}</div><div class="cellsub">of ${s.n} run</div>`,
+      usd(s.cost), `<span class="chip info"><span class="dot"></span>headline withheld</span>`]};
+}
+
+let LIVE = [];                 // last /jobs payload; [] on the file:// artifact
+const jgOpen = new Set();      // metrics expanded -- survives the 3s live re-render
+let selId = null;              // selected row id, re-applied after every re-render
+
+function toggleGroup(metric) {
+  jgOpen.has(metric) ? jgOpen.delete(metric) : jgOpen.add(metric);
+  renderJobs();
+}
+
+function renderJobs() {
+  const items = DATA.jobs.map(curatedItem)
+    .concat(suppressedItem(), LIVE.map(liveItem));
+  const by = {};
+  items.forEach(it => (by[it.metric] = by[it.metric] || []).push(it));
+  const groups = Object.entries(by)
+    .map(([metric, rows]) => ({metric, rows: [...rows].sort((a, b) => b.ts - a.ts)}))
+    .sort((a, b) => b.rows[0].ts - a.rows[0].ts);
+
+  const tbl = document.getElementById('jobs-table');
+  tbl.querySelectorAll('tbody').forEach(t => t.remove());
+  tbl.insertAdjacentHTML('beforeend', groups.map(g => {
+    const L = g.rows[0], n = g.rows.length;   // the newest run IS the group headline
+    if (n === 1)                              // one run: no chrome, click drills straight in
+      return `<tbody class="jobgroup">${jobRow(L.attrs, L.cells)}</tbody>`;
+    const head = [cell0(g.metric, `${n} runs — newest first`, `latest: ${L.desc}`),
+                  ...L.cells.slice(1)];
+    return `<tbody class="jobgroup stack${jgOpen.has(g.metric) ? ' open' : ''}">
+      ${jobRow(`class="ghead" onclick="toggleGroup('${g.metric.replace(/'/g, "\\'")}')"`, head)}
+      ${g.rows.map(r => jobRow(r.attrs, r.cells)).join('')}
+    </tbody>`;
+  }).join(''));
+  if (selId) document.getElementById(selId)?.classList.add('sel');
+}
+
+/* ---------------- drill-down ---------------- */
+/* one selection bar for the whole table -- curated rows and live rows alike */
+function markSel(id, metric) {
+  selId = id;
+  if (metric) jgOpen.add(metric);   // a selected run is never hidden in a closed group
+  renderJobs();
+}
+
+function select(i) {
+  markSel('row-' + i, DATA.jobs[i].metric);
+  ljPolling = null;              // a curated row takes the drill-down back from a live poll
+  const j = DATA.jobs[i];
+  const el = document.getElementById('drill');
+  el.innerHTML = tiles(j) + defPanel(j) + convergencePanel(j)
+    + (i === 0 ? pricePanel() + cappedPanel() : receiptPanel(j))
+    + (j.leaderboard ? leaderboardPanel(j) : '')
+    + (j.samples.length ? samplesPanel(j) : '');
+  drawConvergence(j);
+  if (i === 0) drawCapped();
+  if (j.leaderboard) drawLeaderboard(j);
+}
+
+function tiles(j) {
+  let jc = '';
+  if (j.judge_check) {
+    const q = j.judge_check;
+    const value = q.total ? pct(q.agree / q.total, 0) : `${q.contradictions} / ${j.n}`;
+    const notes = [];
+    if (q.total) notes.push(`${q.agree}/${q.total} exact-set regex match`);
+    if (q.contradictions) notes.push(`${q.contradictions} judge self-contradiction${q.contradictions > 1 ? 's' : ''} (counted as false)`);
+    jc = `<div class="tile"><div class="label">judge validation</div>
+         <div class="value">${value}</div>
+         <div class="note">${notes.join(' · ')}</div></div>`;
+  }
+  return `<div class="tiles">
+    <div class="tile"><div class="label">${j.agg} — ${j.model}${j.search ? ' + web search' : ''}</div>
+      <div class="value hero">${pct(j.estimate)}</div>
+      <div class="note">${j.k} of ${j.n} responses</div></div>
+    <div class="tile"><div class="label">95% ${j.interval || 'confidence'} interval</div>
+      <div class="value">${pts(j.width)}</div>
+      <div class="note">[${pct(j.lo)}, ${pct(j.hi)}] · target ${pts(j.target_width)}</div></div>
+    <div class="tile"><div class="label">spend — billed at stop</div>
+      <div class="value">${usdSmart(j.cost_at_stop)}</div>
+      <div class="note">${j.cost_at_stop < j.cost ? `fixed-N full run ${usdSmart(j.cost)}` : 'full population needed'}
+        · ${usd(j.per_q, 4)}/query</div></div>
+    ${jc}</div>`;
+}
+
+function defPanel(j) {
+  const chk = j.scorer.type === 'function'
+    && (DATA.checks || []).find(c => c.name === j.scorer.name);
+  const yes = chk ? chk.desc.replace(/^true when /, '')   // the row already says "true when"
+    : j.target_brand
+    ? `judge returns <b>${j.agg} = true</b> AND lists “${j.target_brand}” among the
+       recommended brands — a self-contradicting judgment counts as <b>false</b>`
+    : `judge returns <b>${j.agg} = true</b>`;
+  return `<div class="panel">
+    <h3>Measurement definition</h3>
+    <div class="sub">${j.description}</div>
+    <table class="fintab kv"><tbody>
+      <tr><td>system under measurement</td>
+          <td>${j.model}${j.search ? ' + live web search' : ''}, one fresh response per prompt</td></tr>
+      <tr><td>population</td>
+          <td>${j.pop} prompts, fixed — the estimate is defined over exactly this set</td></tr>
+      <tr><td>a response counts as true when</td><td>${yes}</td></tr>
+      <tr><td>scorer</td>
+          <td>${j.scorer.type === 'function'
+            ? `built-in check <b>${j.scorer.name}</b> — deterministic, no judge call, no judge noise`
+            : `${j.scorer.type} — ${j.scorer.model}, temperature 0, strict JSON`}</td></tr>
+    </tbody></table>
+    ${j.scorer.system ? `<details><summary>judge instructions — verbatim from job.json</summary>
+      <div class="resp mono">${esc(j.scorer.system)}</div></details>` : ''}</div>`;
+}
+
+function convergencePanel(j) {
+  return `<div class="panel">
+    <h3>Convergence — the sampler earns its stop</h3>
+    <div class="sub">Wilson 95% interval after each batch of ${DATA.batch}${j.live ? '' : ' (fixed replay order)'}.
+      Rule: stop at width ≤ ${pts(j.target_width)} —
+      ${j.running ? `still running, ${j.n} of ${j.pop} scored`
+        : j.met ? (j.live ? `stopped at <b>${j.stop} of ${j.pop}</b>`
+                          : `median stop over 200 orderings: <b>${j.stop} of ${j.pop}</b>`)
+              : `never reached in this population (${j.n} scored, width ${pts(j.width)}) — Margin says the population is too small, a fixed-N pipeline never would`}.
+    </div>
+    <div id="conv" class="chart" style="height:300px"></div></div>`;
+}
+
+function drawConvergence(j, divId = 'conv') {
+  const t = j.trajectory;
+  const n = t.map(d => d.n);
+  const stopPt = t.find(d => d.n >= j.stop) || t[t.length - 1];
+  const sc = j.met ? col('--good') : j.running ? col('--accent') : col('--warning');
+  const sLabel = j.met ? `STOP · n=${j.stop}` : j.running ? `running · n=${j.n}` : `exhausted · n=${j.n}`;
+  Plotly.newPlot(divId, [
+    {x: n, y: t.map(d => d.hi), mode: 'lines', line: {width: 0},
+     hoverinfo: 'skip', showlegend: false},
+    {x: n, y: t.map(d => d.lo), mode: 'lines', line: {width: 0},
+     fill: 'tonexty', fillcolor: 'rgba(57,135,229,0.13)', hoverinfo: 'skip'},
+    {x: n, y: t.map(d => d.p), mode: 'lines', name: 'estimate',
+     line: {color: col('--accent'), width: 2, shape: 'spline', smoothing: 0.6},
+     hovertemplate: 'n=%{x} · %{y:.1%}<extra></extra>'},
+    {x: [j.met ? j.stop : j.n], y: [stopPt.p], mode: 'markers',
+     marker: {size: 11, color: sc, line: {color: col('--surface'), width: 2}},
+     hovertemplate: (j.met ? 'STOP at n=%{x}' : j.running ? 'running · n=%{x}' : 'population exhausted at n=%{x}') + '<extra></extra>'},
+  ], {...BASE_LAYOUT,
+      xaxis: {...BASE_LAYOUT.xaxis, title: {text: 'executions', font: {size: 11}}, range: [0, j.pop * 1.03]},
+      yaxis: {...BASE_LAYOUT.yaxis, tickformat: '.0%', rangemode: 'tozero'},
+      shapes: [{type: 'line', x0: j.met ? j.stop : j.n, x1: j.met ? j.stop : j.n,
+                y0: 0, y1: 1, yref: 'paper',
+                line: {color: sc, width: 1.5, dash: 'dot'}}],
+      annotations: [{x: j.met ? j.stop : j.n, y: 1, yref: 'paper', showarrow: false,
+                     text: sLabel, font: {size: 11.5, color: sc},
+                     xanchor: j.met ? 'left' : 'right', xshift: j.met ? 7 : -7, yanchor: 'top'}],
+  }, PLOT_CFG);
+}
+
+function receiptPanel(j) {
+  const saved = 1 - j.cost_at_stop / j.cost;
+  return `<div class="panel">
+    <h3>Cost receipt — vs fixed-N</h3>
+    <div class="sub">The naive pipeline runs the full population every time. The measured
+      run below is real spend; the Margin line is the same run cut at the stopping rule.</div>
+    <table class="fintab"><thead>
+      <tr><th>pipeline</th><th class="num">executions</th><th class="num">cost</th><th class="num">Δ</th></tr>
+    </thead><tbody>
+      <tr><td>fixed-N (full population, measured)</td>
+          <td class="num">${j.n}</td><td class="num">${usd(j.cost)}</td><td class="num">—</td></tr>
+      <tr class="hl"><td>Margin (adaptive stop)</td>
+          <td class="num">${j.stop}</td><td class="num">${usd(j.cost_at_stop)}</td>
+          <td class="num">−${pct(saved, 0)}</td></tr>
+    </tbody></table></div>`;
+}
+
+function pricePanel() {
+  const rows = DATA.price_list.map(r => {
+    const cls = r.measured ? 'hl' : (r.feasible ? '' : 'dead');
+    const label = r.measured ? `${pts(r.width)} — measured` : pts(r.width);
+    const nCell = r.feasible ? r.n : `${r.n} — exceeds population`;
+    return `<tr class="${cls}"><td>${label}</td><td class="num">${nCell}</td>
+      <td class="num">${r.feasible ? usd(r.cost) : '—'}</td></tr>`;
+  }).join('');
+  return `<div class="panel">
+    <h3>The precision price list</h3>
+    <div class="sub">Computed from the measured rate and measured $/query. Certainty has a
+      price curve — Margin quotes it before you spend. The bottom row is a finding too:
+      the stated precision needs more prompts than the population holds.</div>
+    <table class="fintab"><thead>
+      <tr><th>precision</th><th class="num">executions needed</th><th class="num">price</th></tr>
+    </thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function cappedPanel() {
+  const c = DATA.capped;
+  return `<div class="panel">
+    <h3>Budget cap — degraded, but honest</h3>
+    <div class="sub">The same job capped at ${c.n} executions (${usd(c.cost)}).
+      A fixed-N-by-vibes pipeline reports the point estimate as fact;
+      Margin reports what you actually know.</div>
+    <div id="capped" class="chart" style="height:170px"></div></div>`;
+}
+
+function drawCapped() {
+  const c = DATA.capped;
+  const rows = [
+    {y: 'full run', p: c.true_p, lo: c.true_lo, hi: c.true_hi, color: col('--deemph')},
+    {y: `capped at ${c.n}`, p: c.estimate, lo: c.lo, hi: c.hi, color: col('--accent')},
+  ];
+  Plotly.newPlot('capped', rows.map(r => ({
+    x: [r.p], y: [r.y], mode: 'markers',
+    marker: {size: 11, color: r.color, line: {color: col('--surface'), width: 2}},
+    error_x: {type: 'data', symmetric: false, array: [r.hi - r.p], arrayminus: [r.p - r.lo],
+              color: r.color, thickness: 2, width: 6},
+    hovertemplate: '%{y}: %{x:.1%}<extra></extra>',
+  })), {...BASE_LAYOUT, hovermode: 'closest',
+        margin: {...BASE_LAYOUT.margin, l: 100},
+        xaxis: {...BASE_LAYOUT.xaxis, tickformat: '.0%', range: [0, 1]},
+        yaxis: {...BASE_LAYOUT.yaxis, showgrid: false}}, PLOT_CFG);
+}
+
+function leaderboardPanel(j) {
+  return `<div class="panel">
+    <h3>Brand leaderboard — % of responses recommending each brand</h3>
+    <div class="sub">Share is defined over this customer's monitoring population.
+      One response can recommend several brands.</div>
+    <div id="lb" class="chart" style="height:${40 + j.leaderboard.length * 34}px"></div></div>`;
+}
+
+function drawLeaderboard(j) {
+  const lb = [...j.leaderboard].reverse();   // plotly draws bottom-up
+  Plotly.newPlot('lb', [{
+    type: 'bar', orientation: 'h',
+    y: lb.map(d => d.brand), x: lb.map(d => d.pct),
+    marker: {color: lb.map(d => d.target ? col('--accent') : col('--deemph'))},
+    text: lb.map(d => pct(d.pct)), textposition: 'outside',
+    textfont: {color: col('--ink-2'), size: 12},
+    hovertemplate: '%{y}: %{x:.1%} (%{customdata} of ' + j.n + ')<extra></extra>',
+    customdata: lb.map(d => d.k),
+  }], {...BASE_LAYOUT, hovermode: 'closest', bargap: 0.45,
+       margin: {...BASE_LAYOUT.margin, l: 150, r: 60},
+       xaxis: {...BASE_LAYOUT.xaxis, tickformat: '.0%', range: [0, Math.max(...lb.map(d => d.pct)) * 1.18]},
+       yaxis: {...BASE_LAYOUT.yaxis, showgrid: false}}, PLOT_CFG);
+}
+
+function samplesPanel(j) {
+  const items = j.samples.map(s => `
+    <details><summary><span class="q">${s.query}</span></summary>
+      <div class="respmeta">${s.id} · ${j.model}${s.searches ? ` · ${s.searches} live web searches` : ''}
+        · ${j.agg}: <b style="color:${s.flag ? col('--good') : col('--serious')}">${s.flag}</b></div>
+      <div class="resp">${esc(s.text)}</div>
+    </details>`).join('');
+  return `<div class="panel">
+    <h3>Raw responses — what the judge scored</h3>
+    <div class="sub">Straight from responses.jsonl, unedited.</div>${items}</div>`;
+}
+
+/* ---------------- memory: what Margin remembers ---------------- */
+function memChip(mode) {
+  if (mode === 'live')   return `<span class="chip good"><span class="dot"></span>EverOS Cloud — live</span>`;
+  if (mode === 'cached') return `<span class="chip info"><span class="dot"></span>EverOS — cached (recorded live traffic)</span>`;
+  return `<span class="chip warn"><span class="dot"></span>local mirror — EverOS push pending</span>`;
+}
+
+const tfmt = ts => new Date(ts * 1000).toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
+
+/* Every remembered baseline is a job that ran, so the Jobs table is the one
+   place a result is reported; memory annotates those rows instead of repeating
+   them. MEM: job_id -> EverOS record. */
+const MEM = {};
+((DATA.memory || {}).baselines || []).forEach(b => MEM[b.job_id] = b);
+
+const memBadge = id => {
+  const b = MEM[id];
+  if (!b) return '';
+  return ` · <span class="memtag">remembered ${tfmt(b.ts)}</span>`
+    + (b.interval === 'credible' ? ` · CI sharpened by ${b.prior_n_eff} prior samples` : '');
+};
+
+/* live-job memory records from GET /memory (http only) -- a job launched from
+   this console visibly lands in memory and its row picks up the badge */
+async function refreshMemory() {
+  if (location.protocol === 'file:') return;   // static artifact stays baked
+  let recs;
+  try { recs = await (await fetch('/memory')).json(); } catch { return; }
+  if (!Array.isArray(recs) || !recs.length) return;
+  recs.forEach(b => MEM[b.job_id] = b);        // newest write per job_id wins
+  renderJobs();
+}
+
+function renderMemory() {
+  const m = DATA.memory;
+  if (!m) return;
+  document.getElementById('memory').innerHTML =
+    `<h2 style="display:flex;align-items:center;gap:12px">Memory
+       ${memChip(m.mode)}</h2>
+     <div class="sub">Every certified result above is written to EverOS, EverMind's memory
+       layer, as the agent's statistical memory — the <b>remembered</b> tag on a job marks
+       when it landed, and a re-run warm-starts from it: same budget, tighter interval.</div>`;
+}
+
+/* ---------------- live job launcher (http only — POST /jobs on this server) */
+const usdSmart = x => usd(x, x < 0.05 ? 4 : 2);
+const ljSlug = s => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+// the judge's field is the metric's own name, as in every curated job.json --
+// so the drill-down labels the tile with what was actually measured
+const ljJudgeSystem = (def, field = 'flag') =>
+  `You evaluate an AI assistant's response. Return STRICT JSON, nothing else:\n` +
+  `{"${field}": true/false}\n\n${field} = true if ${def.trim()}\n` +
+  `${field} = false otherwise. Judge only the RESPONSE TEXT provided.`;
+const $ = id => document.getElementById(id);
+
+let LIVE_PRESETS = {};   // job_id -> preset shaped like a DATA.jobs entry
+
+async function renderLaunch() {
+  if (location.protocol === 'file:') return;   // static demo artifact: no panel
+  // plain file servers 404 or answer /jobs with a directory listing — require the API's JSON array
+  let list;
+  try { list = await (await fetch('/jobs')).json(); } catch { return; }
+  if (!Array.isArray(list)) return;
+  // remembered live jobs re-run like curated metrics: their metric config and
+  // population came back with server rehydration, their baseline is in memory
+  // keyed by metric name: a re-run overwrites, so each metric appears once (newest wins)
+  list.filter(s => s.status === 'done' && (s.requested.prompts || []).length)
+      .forEach(s => { LIVE_PRESETS[s.requested.metric.name] = {
+        metric: s.requested.metric.name, metric_cfg: s.requested.metric,
+        population_texts: s.requested.prompts.map(p => typeof p === 'string' ? p : p.text),
+        pop: s.requested.prompts.length,
+        model: s.requested.measured.model, search: s.requested.measured.web_search,
+        estimate: s.estimate,
+        description: `remembered from live job ${s.id} — a same-model re-run warm-starts
+          from the memory baseline (discounted prior, credible interval, drift guard)`,
+      }; });
+  const presets = DATA.jobs.map((j, i) =>
+    `<option value="${i}">${j.metric}</option>`).join('')
+    + Object.keys(LIVE_PRESETS).map(name =>
+      `<option value="live:${name}">${name} — from memory</option>`).join('');
+  const checks = (DATA.checks || []).map(c =>
+    `<option value="${c.name}">${c.label} — built-in, free</option>`).join('');
+  $('launch').innerHTML = `
+  <h2>Run a live job</h2>
+  <div class="panel">
+    <h3>State what you want to know</h3>
+    <div class="sub" style="margin-bottom:10px">
+      <label style="margin-right:16px"><input type="radio" name="lj-mode" value="re" checked
+        onchange="ljMode()"> re-measure an existing metric</label>
+      <label><input type="radio" name="lj-mode" value="new" onchange="ljMode()"> new measurement</label>
+    </div>
+
+    <div id="lj-re">
+      <div class="sub">The metric brings its own population and judge; choose what varies —
+        the model under measurement, the sample size, the precision. This is the
+        re-certification / pilot path.</div>
+      <div class="formrow" style="margin-top:0">
+        <div class="field"><label>metric</label>
+          <select id="lj-metric" onchange="ljPreset()">${presets}</select></div>
+        <div class="field"><label>sample N <span id="lj-popn" style="color:var(--muted)"></span></label>
+          <input type="number" id="lj-n" min="1" style="width:90px" oninput="ljQuote()"></div>
+      </div>
+      <div class="sub" id="lj-desc" style="margin:8px 0 0"></div>
+    </div>
+
+    <div id="lj-new" style="display:none">
+      <div class="sub">Metric and job born together: your prompts, your definition of true.
+        Anything mechanically checkable should use a built-in check — free, exact, no judge noise.</div>
+      <div class="formrow" style="margin-top:0">
+        <div class="field"><label>scored by</label>
+          <select id="lj-scorer" onchange="ljScorer()">
+            <option value="judge">AI judge — you write the rule</option>${checks}</select></div>
+        <div class="field"><label>metric name</label>
+          <input id="lj-name" placeholder="brand_mentioned" style="width:220px"></div>
+      </div>
+      <div class="sub" id="lj-checkdesc" style="margin:8px 0 0;display:none"></div>
+      <div class="field" id="lj-defwrap" style="margin-top:10px"><label>a response counts as <b>true</b> when…</label>
+        <textarea id="lj-def" rows="2" oninput="ljDef()"
+          placeholder="it names a specific product and recommends it"></textarea></div>
+      <div class="field" style="margin-top:10px">
+        <label>prompts — upload a .txt (one per line), drop it on the box, or type</label>
+        <input type="file" id="lj-file" accept=".txt,text/plain" onchange="ljFile(event)">
+        <textarea id="lj-prompts" rows="4" class="mono" style="margin-top:6px" oninput="ljQuote()"
+          placeholder="What's the best face sunscreen?&#10;What sunscreen won't leave a white cast?"></textarea></div>
+      <details id="lj-judgewrap" style="margin-top:10px"><summary>generated judge instructions</summary>
+        <div class="resp mono" id="lj-judge"></div></details>
+    </div>
+
+    <div class="formrow">
+      <div class="field"><label>measured model</label>
+        <select id="lj-model" onchange="ljQuote()"><option>gpt-4o-mini</option><option>gpt-5</option></select></div>
+      <div class="field"><label>web search</label>
+        <input type="checkbox" id="lj-search" style="height:37px" onchange="ljQuote()"></div>
+      <div class="field"><label>precision ±pts</label>
+        <input type="number" id="lj-prec" value="7" min="1" max="25" style="width:80px" oninput="ljQuote()"></div>
+      <div class="field"><label>budget $</label>
+        <input type="number" id="lj-usd" value="1.00" step="0.25" min="0.05" style="width:90px" oninput="ljQuote()"></div>
+      <button id="lj-go" onclick="launchJob()">Run job</button>
+    </div>
+    <div class="sub" id="lj-quote" style="margin:10px 0 0"></div>
+    <div id="lj-status" style="margin-top:14px"></div>
+  </div>`;
+  const ta = $('lj-prompts');
+  ta.addEventListener('dragover', e => e.preventDefault());
+  ta.addEventListener('drop', e => {
+    e.preventDefault();
+    const f = e.dataTransfer.files[0];
+    if (f) f.text().then(t => { ta.value = t.trim(); ljQuote(); });
+  });
+  ljPreset();
+  renderLiveRows();
+}
+
+function ljMode() {
+  const re = document.querySelector('input[name=lj-mode]:checked').value === 're';
+  $('lj-re').style.display = re ? '' : 'none';
+  $('lj-new').style.display = re ? 'none' : '';
+  if (!re) { $('lj-model').value = 'gpt-4o-mini'; $('lj-search').checked = false; ljScorer(); }
+  else ljPreset();
+}
+
+/* selected built-in check, or undefined when the LLM judge is chosen */
+const ljCheck = () => (DATA.checks || []).find(c => c.name === $('lj-scorer').value);
+
+/* selected re-measure preset: a curated job or a remembered live one */
+const ljSel = () => {
+  const v = $('lj-metric').value;
+  return v.startsWith('live:') ? LIVE_PRESETS[v.slice(5)] : DATA.jobs[+v];
+};
+
+function ljScorer() {
+  const c = ljCheck();
+  $('lj-defwrap').style.display = c ? 'none' : '';       // nothing to define: the check IS the definition
+  $('lj-judgewrap').style.display = c ? 'none' : '';
+  $('lj-checkdesc').style.display = c ? '' : 'none';
+  $('lj-name').placeholder = c ? c.name + '_rate' : 'brand_mentioned';
+  if (!c) return ljDef();
+  $('lj-checkdesc').textContent = `${c.label}: ${c.desc}. Scored locally — no judge call, no judge noise.`;
+  ljQuote();
+}
+
+function ljPreset() {
+  const j = ljSel();
+  $('lj-popn').textContent = `of ${j.pop}`;
+  $('lj-n').value = j.pop; $('lj-n').max = j.pop;
+  $('lj-model').value = j.model; $('lj-search').checked = j.search;
+  $('lj-desc').textContent = `${j.description} — remembered rate ${pct(j.estimate)} on ${j.model}${j.search ? ' + web search' : ''}.`;
+  ljQuote();
+}
+
+function ljDef() {
+  const d = $('lj-def').value.trim();
+  $('lj-judge').textContent = d
+    ? ljJudgeSystem(d, ljSlug($('lj-name').value) || 'flag') : '(write the definition above)';
+  ljQuote();
+}
+
+function ljQuote() {
+  const q = $('lj-quote');
+  const reMode = document.querySelector('input[name=lj-mode]:checked').value === 're';
+  const w = +$('lj-prec').value / 50;
+  const budget = +$('lj-usd').value;
+  let P, p, pLabel;
+  if (reMode) {
+    const j = ljSel();
+    P = Math.min(+$('lj-n').value || j.pop, j.pop);
+    p = j.estimate; pLabel = `the remembered rate ${pct(p)}`;
+  } else {
+    P = $('lj-prompts').value.split('\n').filter(s => s.trim()).length;
+    p = 0.5; pLabel = 'worst-case 50%';
+  }
+  if (!w || !P) { q.innerHTML = ''; return; }
+  // a 0% or 100% remembered rate would quote 0 executions: floor the planning
+  // variance at 5% -- the interval math downstream stays exact, this is a quote
+  const pq = Math.min(0.95, Math.max(0.05, p));
+  const need = Math.ceil(4 * 1.96 * 1.96 * pq * (1 - pq) / (w * w));
+  const runN = Math.min(P, need);
+  const chk = !reMode && ljCheck();     // a built-in check pays generation only
+  const rate = (chk ? DATA.rates_gen : DATA.rates)[
+    $('lj-model').value + '|' + ($('lj-search').checked ? 1 : 0)];
+  const parts = [`±${(50 * w).toFixed(0)}pts at ${pLabel} needs ~${need} executions`];
+  if (P < need) parts.push(`only ${P} available — will run all and report the achieved interval`);
+  if (rate) {
+    parts.push(`quote ≤ ${usdSmart(runN * rate)} at measured rates, less if it converges early`
+               + (chk ? ' — scoring is free, so this is generation only' : ''));
+    if (runN * rate > budget) parts.push(`<b>budget ${usd(budget)} stops at ~${Math.floor(budget / rate)}</b>`);
+  } else parts.push('no measured rate for this model+search combo yet — no quote');
+  q.innerHTML = 'Quote: ' + parts.join(' · ');
+}
+
+function ljFile(e) {
+  const f = e.target.files[0];
+  if (f) f.text().then(t => { $('lj-prompts').value = t.trim(); ljQuote(); });
+}
+
+function launchJob() {
+  const st = $('lj-status');
+  const warn = m => { st.innerHTML = `<span class="chip warn"><span class="dot"></span>${m}</span>`; };
+  const reMode = document.querySelector('input[name=lj-mode]:checked').value === 're';
+  let prompts, metric;
+  if (reMode) {
+    const j = ljSel();
+    metric = j.metric_cfg;
+    prompts = j.population_texts.slice();
+    const N = Math.min(+$('lj-n').value || prompts.length, prompts.length);
+    if (N < prompts.length) {            // random draw, like memory_stats --draw
+      for (let i = prompts.length - 1; i > 0; i--) {
+        const k = Math.floor(Math.random() * (i + 1));
+        [prompts[i], prompts[k]] = [prompts[k], prompts[i]];
+      }
+      prompts = prompts.slice(0, N);
+    }
+  } else {
+    const chk = ljCheck();
+    const name = ljSlug($('lj-name').value) || (chk ? chk.name + '_rate' : '');
+    const def = $('lj-def').value.trim();
+    prompts = $('lj-prompts').value.split('\n').map(s => s.trim()).filter(Boolean);
+    if (!name) return warn('name the metric');
+    if (!chk && !def) return warn('define what counts as true');
+    if (!prompts.length) return warn('supply at least one prompt');
+    metric = chk
+      ? {name, aggregate_field: chk.field, scorer: {type: 'function', name: chk.name}}
+      : {name, aggregate_field: name,
+         scorer: {type: 'llm_judge', model: 'gpt-4o-mini',
+                  system: ljJudgeSystem(def, name), fields: {[name]: 'bool'}}};
+  }
+  const body = {
+    prompts, metric,
+    measured: {model: $('lj-model').value, web_search: $('lj-search').checked},
+    precision: {ci_width: +$('lj-prec').value / 50},
+    // executions are capped by the population itself; $ is the only explicit cap
+    budget: {max_usd: +$('lj-usd').value, max_executions: prompts.length},
+  };
+  $('lj-go').disabled = true;
+  st.innerHTML = `<span class="chip info"><span class="dot"></span>submitting</span>`;
+  fetch('/jobs', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                  body: JSON.stringify(body)})
+    .then(async r => {
+      if (!r.ok) throw new Error(await r.text());
+      const id = (await r.json()).job_id;
+      renderLiveRows();
+      pollJob(id);
+    })
+    .catch(e => {
+      st.innerHTML = `<span class="chip warn"><span class="dot"></span>request failed</span>
+        <div class="mono" style="margin-top:8px;color:var(--warning)">${esc(String(e))}</div>`;
+      $('lj-go').disabled = false;
+    });
+}
+
+function ljChip(s) {
+  return s.status === 'done'
+    ? `<span class="chip good"><span class="dot"></span>${(s.stop_reason || 'done').replace('_', ' ')}</span>`
+    : s.status === 'error'
+      ? `<span class="chip warn"><span class="dot"></span>error</span>`
+      : `<span class="chip info"><span class="dot"></span>${s.stage || s.status}</span>`;
+}
+
+async function renderLiveRows() {
+  let list;
+  try { list = await (await fetch('/jobs')).json(); } catch { return; }
+  if (!Array.isArray(list)) return;
+  LIVE = list;
+  renderJobs();
+  if (list.some(s => s.status !== 'done' && s.status !== 'error'))
+    setTimeout(renderLiveRows, 3000);
+}
+
+let ljPolling = null;   // only the newest requested job keeps its poll loop alive
+
+/* an API job status, shaped like a DATA.jobs entry so the drill-down renders it
+   unchanged. No samples: the API returns statistics, not response text. */
+function liveJob(s) {
+  const m = s.requested.metric;
+  const live = s.status !== 'done' && s.status !== 'error';
+  const mp = s.memory_prior;
+  return {
+    live: true, running: live,
+    interval: s.interval === 'credible' ? 'credible' : undefined,
+    metric: m.name, agg: m.aggregate_field, scorer: m.scorer,
+    description: `live job launched from this console — ${s.population} prompts, `
+      + `stopping rule armed at ${pts(s.requested.precision.ci_width)}`
+      + (mp ? ` — warm-started from the EverOS baseline (${pct(mp.baseline_rate)} at `
+            + `n=${mp.baseline_n}, discounted prior n_eff=${mp.n_eff})`
+            + (mp.drift ? ` — DRIFT GUARD ${mp.drift}` : ', credible interval') : ''),
+    model: s.requested.measured.model, search: s.requested.measured.web_search,
+    estimate: s.estimate, k: s.k, n: s.executions_used, pop: s.population,
+    lo: s.ci ? s.ci[0] : 0, hi: s.ci ? s.ci[1] : 0, width: s.ci_width,
+    target_width: s.requested.precision.ci_width,
+    met: s.stop_reason === 'precision_met', stop: s.executions_used,
+    cost_at_stop: s.cost_usd, cost: s.cost_naive_usd || s.cost_usd,
+    per_q: s.executions_used ? s.cost_usd / s.executions_used : 0,
+    trajectory: s.trajectory, samples: [],
+  };
+}
+
+async function pollJob(id) {
+  const first = ljPolling !== id;   // mid-poll: don't yank the page on every tick
+  ljPolling = id;
+  let s;
+  try { s = await (await fetch('/jobs/' + id)).json(); }
+  catch { if (ljPolling === id) setTimeout(() => pollJob(id), 2500); return; }
+  if (ljPolling !== id) return;     // superseded while the fetch was in flight
+  const live = s.status !== 'done' && s.status !== 'error';
+  const j = liveJob(s);
+  markSel('liverow-' + id, esc(s.requested.metric.name || 'live job'));   // group key is esc'd
+  document.getElementById('lj-status').innerHTML =
+    `${ljChip(s)} <span class="sub">${id} — detail below</span>`;
+  document.getElementById('drill').innerHTML =
+    (s.executions_used ? tiles(j) : `<div class="panel"><h3>${esc(j.metric)}</h3>
+       <div class="sub">${s.stage || s.status} — the first batch of ${DATA.batch}
+       has not finished scoring yet.</div></div>`)
+    + defPanel(j)
+    + (j.trajectory.length ? convergencePanel(j) : '')
+    + (s.error ? `<div class="panel"><h3>Job error</h3>
+        <div class="resp mono" style="color:var(--warning)">${esc(s.error)}</div></div>` : '');
+  if (j.trajectory.length) drawConvergence(j);
+  if (first) document.getElementById('drill').scrollIntoView({behavior: 'smooth', block: 'start'});
+  if (live) setTimeout(() => pollJob(id), 2500);
+  else { document.getElementById('lj-go').disabled = false; renderLiveRows(); refreshMemory(); }
+}
+
+document.getElementById('fn-batch').textContent = DATA.batch;
+renderJobs();
+select(0);
+renderMemory();
+refreshMemory();
+renderLaunch();
+</script>
+</body>
+</html>

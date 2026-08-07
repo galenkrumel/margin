@@ -1,0 +1,28 @@
+# secrets
+.env
+.env.*
+
+# job runs / artifacts
+jobs/
+memory/*.jsonl
+*.log
+
+# generated console (built from console.html by build_console.py)
+margin-console.html
+
+# scratch
+margin-hackathon-plan.md
+files.zip
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# macos
+.DS_Store
+.claude/settings.local.json
+slides.html

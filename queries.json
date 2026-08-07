@@ -1,0 +1,1882 @@
+{
+  "target_brand": "Supergoop",
+  "counts": {
+    "total": 312,
+    "branded": 232,
+    "category": 80
+  },
+  "queries": [
+    {
+      "id": "b-001",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Is Supergoop sunscreen actually good?"
+    },
+    {
+      "id": "b-002",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Is Supergoop sunscreen worth the price?"
+    },
+    {
+      "id": "b-003",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Supergoop sunscreen review \u2014 should I buy it?"
+    },
+    {
+      "id": "b-004",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Is Supergoop sunscreen good for oily skin?"
+    },
+    {
+      "id": "b-005",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Is Supergoop sunscreen safe for sensitive skin?"
+    },
+    {
+      "id": "b-006",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Does Supergoop sunscreen leave a white cast on darker skin?"
+    },
+    {
+      "id": "b-007",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Is Supergoop sunscreen reef safe?"
+    },
+    {
+      "id": "b-008",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Is Supergoop sunscreen chemical or mineral?"
+    },
+    {
+      "id": "b-009",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Is Supergoop sunscreen safe to use during pregnancy?"
+    },
+    {
+      "id": "b-010",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Can I use Supergoop sunscreen on my kids?"
+    },
+    {
+      "id": "b-011",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Where should I buy Supergoop sunscreen \u2014 is it cheaper at Target or Ulta?"
+    },
+    {
+      "id": "b-012",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "What's a good cheaper dupe for Supergoop sunscreen?"
+    },
+    {
+      "id": "b-013",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Does Supergoop sunscreen break people out?"
+    },
+    {
+      "id": "b-014",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "How water resistant is Supergoop sunscreen really?"
+    },
+    {
+      "id": "b-015",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Is Supergoop sunscreen good for everyday wear or just the beach?"
+    },
+    {
+      "id": "b-016",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Does Supergoop sunscreen feel greasy?"
+    },
+    {
+      "id": "b-017",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "What do reviews say about Supergoop sunscreen?"
+    },
+    {
+      "id": "b-018",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Which Supergoop sunscreen should I get for my face?"
+    },
+    {
+      "id": "b-019",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Is Supergoop a reputable sunscreen brand?"
+    },
+    {
+      "id": "b-020",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Does Supergoop sunscreen expire fast once opened?"
+    },
+    {
+      "id": "b-021",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Is Sun Bum sunscreen actually good?"
+    },
+    {
+      "id": "b-022",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Is Sun Bum sunscreen worth the price?"
+    },
+    {
+      "id": "b-023",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Sun Bum sunscreen review \u2014 should I buy it?"
+    },
+    {
+      "id": "b-024",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Is Sun Bum sunscreen good for oily skin?"
+    },
+    {
+      "id": "b-025",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Is Sun Bum sunscreen safe for sensitive skin?"
+    },
+    {
+      "id": "b-026",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Does Sun Bum sunscreen leave a white cast on darker skin?"
+    },
+    {
+      "id": "b-027",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Is Sun Bum sunscreen reef safe?"
+    },
+    {
+      "id": "b-028",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Is Sun Bum sunscreen chemical or mineral?"
+    },
+    {
+      "id": "b-029",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Is Sun Bum sunscreen safe to use during pregnancy?"
+    },
+    {
+      "id": "b-030",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Can I use Sun Bum sunscreen on my kids?"
+    },
+    {
+      "id": "b-031",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Where should I buy Sun Bum sunscreen \u2014 is it cheaper at Target or Ulta?"
+    },
+    {
+      "id": "b-032",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "What's a good cheaper dupe for Sun Bum sunscreen?"
+    },
+    {
+      "id": "b-033",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Does Sun Bum sunscreen break people out?"
+    },
+    {
+      "id": "b-034",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "How water resistant is Sun Bum sunscreen really?"
+    },
+    {
+      "id": "b-035",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Is Sun Bum sunscreen good for everyday wear or just the beach?"
+    },
+    {
+      "id": "b-036",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Does Sun Bum sunscreen feel greasy?"
+    },
+    {
+      "id": "b-037",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "What do reviews say about Sun Bum sunscreen?"
+    },
+    {
+      "id": "b-038",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Which Sun Bum sunscreen should I get for my face?"
+    },
+    {
+      "id": "b-039",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Is Sun Bum a reputable sunscreen brand?"
+    },
+    {
+      "id": "b-040",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Does Sun Bum sunscreen expire fast once opened?"
+    },
+    {
+      "id": "b-041",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Is Neutrogena sunscreen actually good?"
+    },
+    {
+      "id": "b-042",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Is Neutrogena sunscreen worth the price?"
+    },
+    {
+      "id": "b-043",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Neutrogena sunscreen review \u2014 should I buy it?"
+    },
+    {
+      "id": "b-044",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Is Neutrogena sunscreen good for oily skin?"
+    },
+    {
+      "id": "b-045",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Is Neutrogena sunscreen safe for sensitive skin?"
+    },
+    {
+      "id": "b-046",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Does Neutrogena sunscreen leave a white cast on darker skin?"
+    },
+    {
+      "id": "b-047",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Is Neutrogena sunscreen reef safe?"
+    },
+    {
+      "id": "b-048",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Is Neutrogena sunscreen chemical or mineral?"
+    },
+    {
+      "id": "b-049",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Is Neutrogena sunscreen safe to use during pregnancy?"
+    },
+    {
+      "id": "b-050",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Can I use Neutrogena sunscreen on my kids?"
+    },
+    {
+      "id": "b-051",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Where should I buy Neutrogena sunscreen \u2014 is it cheaper at Target or Ulta?"
+    },
+    {
+      "id": "b-052",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "What's a good cheaper dupe for Neutrogena sunscreen?"
+    },
+    {
+      "id": "b-053",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Does Neutrogena sunscreen break people out?"
+    },
+    {
+      "id": "b-054",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "How water resistant is Neutrogena sunscreen really?"
+    },
+    {
+      "id": "b-055",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Is Neutrogena sunscreen good for everyday wear or just the beach?"
+    },
+    {
+      "id": "b-056",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Does Neutrogena sunscreen feel greasy?"
+    },
+    {
+      "id": "b-057",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "What do reviews say about Neutrogena sunscreen?"
+    },
+    {
+      "id": "b-058",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Which Neutrogena sunscreen should I get for my face?"
+    },
+    {
+      "id": "b-059",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Is Neutrogena a reputable sunscreen brand?"
+    },
+    {
+      "id": "b-060",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Does Neutrogena sunscreen expire fast once opened?"
+    },
+    {
+      "id": "b-061",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Is La Roche-Posay sunscreen actually good?"
+    },
+    {
+      "id": "b-062",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Is La Roche-Posay sunscreen worth the price?"
+    },
+    {
+      "id": "b-063",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "La Roche-Posay sunscreen review \u2014 should I buy it?"
+    },
+    {
+      "id": "b-064",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Is La Roche-Posay sunscreen good for oily skin?"
+    },
+    {
+      "id": "b-065",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Is La Roche-Posay sunscreen safe for sensitive skin?"
+    },
+    {
+      "id": "b-066",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Does La Roche-Posay sunscreen leave a white cast on darker skin?"
+    },
+    {
+      "id": "b-067",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Is La Roche-Posay sunscreen reef safe?"
+    },
+    {
+      "id": "b-068",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Is La Roche-Posay sunscreen chemical or mineral?"
+    },
+    {
+      "id": "b-069",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Is La Roche-Posay sunscreen safe to use during pregnancy?"
+    },
+    {
+      "id": "b-070",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Can I use La Roche-Posay sunscreen on my kids?"
+    },
+    {
+      "id": "b-071",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Where should I buy La Roche-Posay sunscreen \u2014 is it cheaper at Target or Ulta?"
+    },
+    {
+      "id": "b-072",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "What's a good cheaper dupe for La Roche-Posay sunscreen?"
+    },
+    {
+      "id": "b-073",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Does La Roche-Posay sunscreen break people out?"
+    },
+    {
+      "id": "b-074",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "How water resistant is La Roche-Posay sunscreen really?"
+    },
+    {
+      "id": "b-075",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Is La Roche-Posay sunscreen good for everyday wear or just the beach?"
+    },
+    {
+      "id": "b-076",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Does La Roche-Posay sunscreen feel greasy?"
+    },
+    {
+      "id": "b-077",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "What do reviews say about La Roche-Posay sunscreen?"
+    },
+    {
+      "id": "b-078",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Which La Roche-Posay sunscreen should I get for my face?"
+    },
+    {
+      "id": "b-079",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Is La Roche-Posay a reputable sunscreen brand?"
+    },
+    {
+      "id": "b-080",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Does La Roche-Posay sunscreen expire fast once opened?"
+    },
+    {
+      "id": "b-081",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Is EltaMD sunscreen actually good?"
+    },
+    {
+      "id": "b-082",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Is EltaMD sunscreen worth the price?"
+    },
+    {
+      "id": "b-083",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "EltaMD sunscreen review \u2014 should I buy it?"
+    },
+    {
+      "id": "b-084",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Is EltaMD sunscreen good for oily skin?"
+    },
+    {
+      "id": "b-085",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Is EltaMD sunscreen safe for sensitive skin?"
+    },
+    {
+      "id": "b-086",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Does EltaMD sunscreen leave a white cast on darker skin?"
+    },
+    {
+      "id": "b-087",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Is EltaMD sunscreen reef safe?"
+    },
+    {
+      "id": "b-088",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Is EltaMD sunscreen chemical or mineral?"
+    },
+    {
+      "id": "b-089",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Is EltaMD sunscreen safe to use during pregnancy?"
+    },
+    {
+      "id": "b-090",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Can I use EltaMD sunscreen on my kids?"
+    },
+    {
+      "id": "b-091",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Where should I buy EltaMD sunscreen \u2014 is it cheaper at Target or Ulta?"
+    },
+    {
+      "id": "b-092",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "What's a good cheaper dupe for EltaMD sunscreen?"
+    },
+    {
+      "id": "b-093",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Does EltaMD sunscreen break people out?"
+    },
+    {
+      "id": "b-094",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "How water resistant is EltaMD sunscreen really?"
+    },
+    {
+      "id": "b-095",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Is EltaMD sunscreen good for everyday wear or just the beach?"
+    },
+    {
+      "id": "b-096",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Does EltaMD sunscreen feel greasy?"
+    },
+    {
+      "id": "b-097",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "What do reviews say about EltaMD sunscreen?"
+    },
+    {
+      "id": "b-098",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Which EltaMD sunscreen should I get for my face?"
+    },
+    {
+      "id": "b-099",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Is EltaMD a reputable sunscreen brand?"
+    },
+    {
+      "id": "b-100",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Does EltaMD sunscreen expire fast once opened?"
+    },
+    {
+      "id": "b-101",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Is CeraVe sunscreen actually good?"
+    },
+    {
+      "id": "b-102",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Is CeraVe sunscreen worth the price?"
+    },
+    {
+      "id": "b-103",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "CeraVe sunscreen review \u2014 should I buy it?"
+    },
+    {
+      "id": "b-104",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Is CeraVe sunscreen good for oily skin?"
+    },
+    {
+      "id": "b-105",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Is CeraVe sunscreen safe for sensitive skin?"
+    },
+    {
+      "id": "b-106",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Does CeraVe sunscreen leave a white cast on darker skin?"
+    },
+    {
+      "id": "b-107",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Is CeraVe sunscreen reef safe?"
+    },
+    {
+      "id": "b-108",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Is CeraVe sunscreen chemical or mineral?"
+    },
+    {
+      "id": "b-109",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Is CeraVe sunscreen safe to use during pregnancy?"
+    },
+    {
+      "id": "b-110",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Can I use CeraVe sunscreen on my kids?"
+    },
+    {
+      "id": "b-111",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Where should I buy CeraVe sunscreen \u2014 is it cheaper at Target or Ulta?"
+    },
+    {
+      "id": "b-112",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "What's a good cheaper dupe for CeraVe sunscreen?"
+    },
+    {
+      "id": "b-113",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Does CeraVe sunscreen break people out?"
+    },
+    {
+      "id": "b-114",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "How water resistant is CeraVe sunscreen really?"
+    },
+    {
+      "id": "b-115",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Is CeraVe sunscreen good for everyday wear or just the beach?"
+    },
+    {
+      "id": "b-116",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Does CeraVe sunscreen feel greasy?"
+    },
+    {
+      "id": "b-117",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "What do reviews say about CeraVe sunscreen?"
+    },
+    {
+      "id": "b-118",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Which CeraVe sunscreen should I get for my face?"
+    },
+    {
+      "id": "b-119",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Is CeraVe a reputable sunscreen brand?"
+    },
+    {
+      "id": "b-120",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Does CeraVe sunscreen expire fast once opened?"
+    },
+    {
+      "id": "b-121",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Is Coppertone sunscreen actually good?"
+    },
+    {
+      "id": "b-122",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Is Coppertone sunscreen worth the price?"
+    },
+    {
+      "id": "b-123",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Coppertone sunscreen review \u2014 should I buy it?"
+    },
+    {
+      "id": "b-124",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Is Coppertone sunscreen good for oily skin?"
+    },
+    {
+      "id": "b-125",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Is Coppertone sunscreen safe for sensitive skin?"
+    },
+    {
+      "id": "b-126",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Does Coppertone sunscreen leave a white cast on darker skin?"
+    },
+    {
+      "id": "b-127",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Is Coppertone sunscreen reef safe?"
+    },
+    {
+      "id": "b-128",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Is Coppertone sunscreen chemical or mineral?"
+    },
+    {
+      "id": "b-129",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Is Coppertone sunscreen safe to use during pregnancy?"
+    },
+    {
+      "id": "b-130",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Can I use Coppertone sunscreen on my kids?"
+    },
+    {
+      "id": "b-131",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Where should I buy Coppertone sunscreen \u2014 is it cheaper at Target or Ulta?"
+    },
+    {
+      "id": "b-132",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "What's a good cheaper dupe for Coppertone sunscreen?"
+    },
+    {
+      "id": "b-133",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Does Coppertone sunscreen break people out?"
+    },
+    {
+      "id": "b-134",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "How water resistant is Coppertone sunscreen really?"
+    },
+    {
+      "id": "b-135",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Is Coppertone sunscreen good for everyday wear or just the beach?"
+    },
+    {
+      "id": "b-136",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Does Coppertone sunscreen feel greasy?"
+    },
+    {
+      "id": "b-137",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "What do reviews say about Coppertone sunscreen?"
+    },
+    {
+      "id": "b-138",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Which Coppertone sunscreen should I get for my face?"
+    },
+    {
+      "id": "b-139",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Is Coppertone a reputable sunscreen brand?"
+    },
+    {
+      "id": "b-140",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Does Coppertone sunscreen expire fast once opened?"
+    },
+    {
+      "id": "b-141",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Is Black Girl Sunscreen sunscreen actually good?"
+    },
+    {
+      "id": "b-142",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Is Black Girl Sunscreen sunscreen worth the price?"
+    },
+    {
+      "id": "b-143",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Black Girl Sunscreen sunscreen review \u2014 should I buy it?"
+    },
+    {
+      "id": "b-144",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Is Black Girl Sunscreen sunscreen good for oily skin?"
+    },
+    {
+      "id": "b-145",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Is Black Girl Sunscreen sunscreen safe for sensitive skin?"
+    },
+    {
+      "id": "b-146",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Does Black Girl Sunscreen sunscreen leave a white cast on darker skin?"
+    },
+    {
+      "id": "b-147",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Is Black Girl Sunscreen sunscreen reef safe?"
+    },
+    {
+      "id": "b-148",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Is Black Girl Sunscreen sunscreen chemical or mineral?"
+    },
+    {
+      "id": "b-149",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Is Black Girl Sunscreen sunscreen safe to use during pregnancy?"
+    },
+    {
+      "id": "b-150",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Can I use Black Girl Sunscreen sunscreen on my kids?"
+    },
+    {
+      "id": "b-151",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Where should I buy Black Girl Sunscreen sunscreen \u2014 is it cheaper at Target or Ulta?"
+    },
+    {
+      "id": "b-152",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "What's a good cheaper dupe for Black Girl Sunscreen sunscreen?"
+    },
+    {
+      "id": "b-153",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Does Black Girl Sunscreen sunscreen break people out?"
+    },
+    {
+      "id": "b-154",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "How water resistant is Black Girl Sunscreen sunscreen really?"
+    },
+    {
+      "id": "b-155",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Is Black Girl Sunscreen sunscreen good for everyday wear or just the beach?"
+    },
+    {
+      "id": "b-156",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Does Black Girl Sunscreen sunscreen feel greasy?"
+    },
+    {
+      "id": "b-157",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "What do reviews say about Black Girl Sunscreen sunscreen?"
+    },
+    {
+      "id": "b-158",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Which Black Girl Sunscreen sunscreen should I get for my face?"
+    },
+    {
+      "id": "b-159",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Is Black Girl Sunscreen a reputable sunscreen brand?"
+    },
+    {
+      "id": "b-160",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Does Black Girl Sunscreen sunscreen expire fast once opened?"
+    },
+    {
+      "id": "b-161",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Is Supergoop Unseen Sunscreen good under makeup?"
+    },
+    {
+      "id": "b-162",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Does Supergoop Unseen Sunscreen clog pores?"
+    },
+    {
+      "id": "b-163",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Supergoop Unseen vs Glowscreen \u2014 which one for everyday?"
+    },
+    {
+      "id": "b-164",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Is Supergoop Glowscreen too shiny for oily skin?"
+    },
+    {
+      "id": "b-165",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Is Supergoop Play Everyday Lotion water resistant enough for the beach?"
+    },
+    {
+      "id": "b-166",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Does Supergoop Mineral Sheerscreen leave a white cast?"
+    },
+    {
+      "id": "b-167",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Why is Supergoop so expensive \u2014 is it actually better?"
+    },
+    {
+      "id": "b-168",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Is Supergoop Unseen enough sun protection on its own at SPF 40?"
+    },
+    {
+      "id": "b-169",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Can I use Supergoop Unseen as a makeup primer?"
+    },
+    {
+      "id": "b-170",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Does Supergoop Glowscreen work on textured skin?"
+    },
+    {
+      "id": "b-171",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Is Sun Bum Original SPF 50 good for the face or just body?"
+    },
+    {
+      "id": "b-172",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Does Sun Bum sunscreen smell too strong?"
+    },
+    {
+      "id": "b-173",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Is Sun Bum Face 50 Clear Zinc greasy?"
+    },
+    {
+      "id": "b-174",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "How long does Sun Bum SPF 50 last in the water?"
+    },
+    {
+      "id": "b-175",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Is Sun Bum okay for acne-prone skin?"
+    },
+    {
+      "id": "b-176",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Does Neutrogena Ultra Sheer Dry-Touch pill under makeup?"
+    },
+    {
+      "id": "b-177",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Is Neutrogena Hydro Boost SPF 50 hydrating enough for dry skin?"
+    },
+    {
+      "id": "b-178",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Is Neutrogena Sheer Zinc good for sensitive skin?"
+    },
+    {
+      "id": "b-179",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Does Neutrogena Ultra Sheer sting your eyes when you sweat?"
+    },
+    {
+      "id": "b-180",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Is Neutrogena sunscreen good enough or should I spend more?"
+    },
+    {
+      "id": "b-181",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Is La Roche-Posay Anthelios worth the hype?"
+    },
+    {
+      "id": "b-182",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Anthelios Melt-in Milk vs Anthelios Mineral \u2014 which should I get?"
+    },
+    {
+      "id": "b-183",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Is La Roche-Posay Anthelios good for rosacea?"
+    },
+    {
+      "id": "b-184",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Does Anthelios Melt-in Milk feel greasy in humidity?"
+    },
+    {
+      "id": "b-185",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Is La Roche-Posay Anthelios Clear Skin good for acne?"
+    },
+    {
+      "id": "b-186",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Is EltaMD UV Clear worth it for acne-prone skin?"
+    },
+    {
+      "id": "b-187",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "EltaMD UV Clear vs UV Daily \u2014 which one do I need?"
+    },
+    {
+      "id": "b-188",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Do dermatologists actually recommend EltaMD?"
+    },
+    {
+      "id": "b-189",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Is EltaMD UV Clear okay under foundation?"
+    },
+    {
+      "id": "b-190",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Is EltaMD UV Sport sweat-proof for running?"
+    },
+    {
+      "id": "b-191",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Is CeraVe Hydrating Mineral Sunscreen good for the face?"
+    },
+    {
+      "id": "b-192",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Does CeraVe AM Lotion SPF 30 count as enough sunscreen?"
+    },
+    {
+      "id": "b-193",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Does CeraVe mineral sunscreen leave a white cast?"
+    },
+    {
+      "id": "b-194",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Is CeraVe sunscreen non-comedogenic?"
+    },
+    {
+      "id": "b-195",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Is Coppertone Sport good enough for a full beach day?"
+    },
+    {
+      "id": "b-196",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Is Coppertone Pure & Simple safe for babies?"
+    },
+    {
+      "id": "b-197",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Does Coppertone Sport rub off with sweat?"
+    },
+    {
+      "id": "b-198",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Is Coppertone Water Babies actually gentle?"
+    },
+    {
+      "id": "b-199",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Does Black Girl Sunscreen really leave no white cast?"
+    },
+    {
+      "id": "b-200",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Is Black Girl Sunscreen SPF 30 enough for daily wear?"
+    },
+    {
+      "id": "b-201",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Is Black Girl Sunscreen Make It Matte good for oily skin?"
+    },
+    {
+      "id": "b-202",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Is Black Girl Sunscreen moisturizing enough to skip lotion?"
+    },
+    {
+      "id": "b-203",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Supergoop vs EltaMD for everyday face sunscreen \u2014 which is better?"
+    },
+    {
+      "id": "b-204",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Supergoop Unseen vs La Roche-Posay Anthelios \u2014 which feels better under makeup?"
+    },
+    {
+      "id": "b-205",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Is Supergoop better than Sun Bum or just more expensive?"
+    },
+    {
+      "id": "b-206",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Supergoop Glowscreen vs a drugstore SPF \u2014 is the difference real?"
+    },
+    {
+      "id": "b-207",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Supergoop vs Black Girl Sunscreen for no white cast?"
+    },
+    {
+      "id": "b-208",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "EltaMD UV Clear vs La Roche-Posay Anthelios for acne-prone skin?"
+    },
+    {
+      "id": "b-209",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "EltaMD vs CeraVe sunscreen \u2014 is EltaMD worth 3x the price?"
+    },
+    {
+      "id": "b-210",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Neutrogena vs Coppertone for a family beach trip?"
+    },
+    {
+      "id": "b-211",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Neutrogena Ultra Sheer vs Sun Bum Original \u2014 which for sports?"
+    },
+    {
+      "id": "b-212",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "La Roche-Posay vs EltaMD \u2014 which do dermatologists prefer?"
+    },
+    {
+      "id": "b-213",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Anthelios vs Supergoop Unseen for combination skin?"
+    },
+    {
+      "id": "b-214",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Sun Bum vs Coppertone Sport for surfing?"
+    },
+    {
+      "id": "b-215",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Sun Bum Mineral vs Blue Lizard for reef-safe surfing?"
+    },
+    {
+      "id": "b-216",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "CeraVe sunscreen vs Neutrogena \u2014 best drugstore option?"
+    },
+    {
+      "id": "b-217",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "CeraVe AM SPF 30 vs EltaMD UV Daily as a daily moisturizer with SPF?"
+    },
+    {
+      "id": "b-218",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "Coppertone vs Banana Boat \u2014 which actually protects better?"
+    },
+    {
+      "id": "b-219",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Black Girl Sunscreen vs Supergoop Unseen for deep skin tones?"
+    },
+    {
+      "id": "b-220",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Black Girl Sunscreen vs Fenty Skin Hydra Vizor?"
+    },
+    {
+      "id": "b-221",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "My dermatologist said wear SPF daily \u2014 is Supergoop Unseen a good pick to start with?"
+    },
+    {
+      "id": "b-222",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Going to Hawaii next month, is Supergoop legal there under the reef law?"
+    },
+    {
+      "id": "b-223",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Is there a Supergoop set that's good as a gift?"
+    },
+    {
+      "id": "b-224",
+      "type": "branded",
+      "brand": "Supergoop",
+      "text": "Does Sephora or Amazon have better prices on Supergoop?"
+    },
+    {
+      "id": "b-225",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "My esthetician recommended EltaMD \u2014 where do I even buy it?"
+    },
+    {
+      "id": "b-226",
+      "type": "branded",
+      "brand": "EltaMD",
+      "text": "Is EltaMD on Amazon legit or should I buy from a derm's office?"
+    },
+    {
+      "id": "b-227",
+      "type": "branded",
+      "brand": "La Roche-Posay",
+      "text": "Is the French version of Anthelios better than the US one?"
+    },
+    {
+      "id": "b-228",
+      "type": "branded",
+      "brand": "Neutrogena",
+      "text": "Is Neutrogena's spray sunscreen safe to breathe around kids?"
+    },
+    {
+      "id": "b-229",
+      "type": "branded",
+      "brand": "Sun Bum",
+      "text": "Is Sun Bum's lip balm SPF worth adding to a beach order?"
+    },
+    {
+      "id": "b-230",
+      "type": "branded",
+      "brand": "Coppertone",
+      "text": "My kid hates sunscreen \u2014 is Coppertone Water Babies easy to rub in fast?"
+    },
+    {
+      "id": "b-231",
+      "type": "branded",
+      "brand": "CeraVe",
+      "text": "Can I just use CeraVe AM lotion and skip a separate sunscreen for the office?"
+    },
+    {
+      "id": "b-232",
+      "type": "branded",
+      "brand": "Black Girl Sunscreen",
+      "text": "Which Black Girl Sunscreen should I get for oily acne-prone skin?"
+    },
+    {
+      "id": "c-233",
+      "type": "category",
+      "brand": null,
+      "text": "What's the best face sunscreen?"
+    },
+    {
+      "id": "c-234",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen for everyday use?"
+    },
+    {
+      "id": "c-235",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen for oily skin?"
+    },
+    {
+      "id": "c-236",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen for dry skin?"
+    },
+    {
+      "id": "c-237",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen for sensitive skin?"
+    },
+    {
+      "id": "c-238",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen for acne-prone skin that won't clog pores?"
+    },
+    {
+      "id": "c-239",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen with no white cast for dark skin?"
+    },
+    {
+      "id": "c-240",
+      "type": "category",
+      "brand": null,
+      "text": "Best mineral sunscreen for the face?"
+    },
+    {
+      "id": "c-241",
+      "type": "category",
+      "brand": null,
+      "text": "Best chemical sunscreen that doesn't sting eyes?"
+    },
+    {
+      "id": "c-242",
+      "type": "category",
+      "brand": null,
+      "text": "Best reef-safe sunscreen?"
+    },
+    {
+      "id": "c-243",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen to wear under makeup?"
+    },
+    {
+      "id": "c-244",
+      "type": "category",
+      "brand": null,
+      "text": "Best drugstore sunscreen under $15?"
+    },
+    {
+      "id": "c-245",
+      "type": "category",
+      "brand": null,
+      "text": "Best high-end sunscreen that's actually worth it?"
+    },
+    {
+      "id": "c-246",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen for kids?"
+    },
+    {
+      "id": "c-247",
+      "type": "category",
+      "brand": null,
+      "text": "Best baby-safe sunscreen?"
+    },
+    {
+      "id": "c-248",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen for swimming and water sports?"
+    },
+    {
+      "id": "c-249",
+      "type": "category",
+      "brand": null,
+      "text": "Best sweat-proof sunscreen for running?"
+    },
+    {
+      "id": "c-250",
+      "type": "category",
+      "brand": null,
+      "text": "Best spray sunscreen that actually works?"
+    },
+    {
+      "id": "c-251",
+      "type": "category",
+      "brand": null,
+      "text": "Best SPF 50 face sunscreen?"
+    },
+    {
+      "id": "c-252",
+      "type": "category",
+      "brand": null,
+      "text": "Best tinted sunscreen?"
+    },
+    {
+      "id": "c-253",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen for rosacea?"
+    },
+    {
+      "id": "c-254",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen for mature skin?"
+    },
+    {
+      "id": "c-255",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen for men who hate the greasy feeling?"
+    },
+    {
+      "id": "c-256",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen stick for reapplying over makeup?"
+    },
+    {
+      "id": "c-257",
+      "type": "category",
+      "brand": null,
+      "text": "Best Korean or Japanese sunscreen I can buy in the US?"
+    },
+    {
+      "id": "c-258",
+      "type": "category",
+      "brand": null,
+      "text": "Best pregnancy-safe sunscreen?"
+    },
+    {
+      "id": "c-259",
+      "type": "category",
+      "brand": null,
+      "text": "Best fragrance-free sunscreen?"
+    },
+    {
+      "id": "c-260",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen for a beach vacation?"
+    },
+    {
+      "id": "c-261",
+      "type": "category",
+      "brand": null,
+      "text": "Best facial moisturizer with SPF built in?"
+    },
+    {
+      "id": "c-262",
+      "type": "category",
+      "brand": null,
+      "text": "Best matte-finish sunscreen for oily skin?"
+    },
+    {
+      "id": "c-263",
+      "type": "category",
+      "brand": null,
+      "text": "Recommend a sunscreen for combination skin that works as a primer."
+    },
+    {
+      "id": "c-264",
+      "type": "category",
+      "brand": null,
+      "text": "Recommend a sunscreen for a toddler with eczema."
+    },
+    {
+      "id": "c-265",
+      "type": "category",
+      "brand": null,
+      "text": "Recommend a lightweight daily SPF I'll actually wear."
+    },
+    {
+      "id": "c-266",
+      "type": "category",
+      "brand": null,
+      "text": "Recommend a sunscreen for hiking at altitude."
+    },
+    {
+      "id": "c-267",
+      "type": "category",
+      "brand": null,
+      "text": "Recommend a sunscreen for tattooed skin."
+    },
+    {
+      "id": "c-268",
+      "type": "category",
+      "brand": null,
+      "text": "Recommend a face sunscreen that plays well with retinol."
+    },
+    {
+      "id": "c-269",
+      "type": "category",
+      "brand": null,
+      "text": "Recommend a sunscreen for someone who breaks out from everything."
+    },
+    {
+      "id": "c-270",
+      "type": "category",
+      "brand": null,
+      "text": "Recommend a reef-safe sunscreen for a Hawaii trip."
+    },
+    {
+      "id": "c-271",
+      "type": "category",
+      "brand": null,
+      "text": "Recommend a sunscreen that won't flash back in photos."
+    },
+    {
+      "id": "c-272",
+      "type": "category",
+      "brand": null,
+      "text": "Recommend a sunscreen for a bald head."
+    },
+    {
+      "id": "c-273",
+      "type": "category",
+      "brand": null,
+      "text": "What sunscreen do dermatologists actually use themselves?"
+    },
+    {
+      "id": "c-274",
+      "type": "category",
+      "brand": null,
+      "text": "What sunscreen should I buy if I've never worn it daily before?"
+    },
+    {
+      "id": "c-275",
+      "type": "category",
+      "brand": null,
+      "text": "What's the best sunscreen at Target right now?"
+    },
+    {
+      "id": "c-276",
+      "type": "category",
+      "brand": null,
+      "text": "What sunscreen won't pill under foundation?"
+    },
+    {
+      "id": "c-277",
+      "type": "category",
+      "brand": null,
+      "text": "What's a good sunscreen that doesn't feel like sunscreen?"
+    },
+    {
+      "id": "c-278",
+      "type": "category",
+      "brand": null,
+      "text": "What sunscreen is best for melasma?"
+    },
+    {
+      "id": "c-279",
+      "type": "category",
+      "brand": null,
+      "text": "What SPF should I use daily, and which product?"
+    },
+    {
+      "id": "c-280",
+      "type": "category",
+      "brand": null,
+      "text": "What's the best sunscreen at Ulta?"
+    },
+    {
+      "id": "c-281",
+      "type": "category",
+      "brand": null,
+      "text": "What's the best sunscreen on Amazon that's not counterfeit?"
+    },
+    {
+      "id": "c-282",
+      "type": "category",
+      "brand": null,
+      "text": "What sunscreen do makeup artists use under foundation?"
+    },
+    {
+      "id": "c-283",
+      "type": "category",
+      "brand": null,
+      "text": "I'm oily and acne-prone, sunscreen recs?"
+    },
+    {
+      "id": "c-284",
+      "type": "category",
+      "brand": null,
+      "text": "Cheap sunscreen that doesn't suck?"
+    },
+    {
+      "id": "c-285",
+      "type": "category",
+      "brand": null,
+      "text": "Sunscreen that won't make me look ghostly, go."
+    },
+    {
+      "id": "c-286",
+      "type": "category",
+      "brand": null,
+      "text": "Going to Cabo Friday, what sunscreen do I throw in my bag?"
+    },
+    {
+      "id": "c-287",
+      "type": "category",
+      "brand": null,
+      "text": "My face burns through SPF 30 \u2014 what should I switch to?"
+    },
+    {
+      "id": "c-288",
+      "type": "category",
+      "brand": null,
+      "text": "Sunscreen for my teenage son who plays soccer outside all day?"
+    },
+    {
+      "id": "c-289",
+      "type": "category",
+      "brand": null,
+      "text": "I hate reapplying \u2014 is there a sunscreen that lasts longest?"
+    },
+    {
+      "id": "c-290",
+      "type": "category",
+      "brand": null,
+      "text": "Every sunscreen stings my eyes at the gym, help?"
+    },
+    {
+      "id": "c-291",
+      "type": "category",
+      "brand": null,
+      "text": "What sunscreen for a golfer out 5 hours at a time?"
+    },
+    {
+      "id": "c-292",
+      "type": "category",
+      "brand": null,
+      "text": "New to skincare, what SPF do I start with?"
+    },
+    {
+      "id": "c-293",
+      "type": "category",
+      "brand": null,
+      "text": "Is mineral or chemical sunscreen better, and which product should I get?"
+    },
+    {
+      "id": "c-294",
+      "type": "category",
+      "brand": null,
+      "text": "Which sunscreens are actually reef safe, not just labeled that way?"
+    },
+    {
+      "id": "c-295",
+      "type": "category",
+      "brand": null,
+      "text": "Which sunscreen has the best ingredients according to EWG?"
+    },
+    {
+      "id": "c-296",
+      "type": "category",
+      "brand": null,
+      "text": "Which sunscreens are non-comedogenic and fragrance free?"
+    },
+    {
+      "id": "c-297",
+      "type": "category",
+      "brand": null,
+      "text": "Which sunscreen is safest for pregnancy according to OBs?"
+    },
+    {
+      "id": "c-298",
+      "type": "category",
+      "brand": null,
+      "text": "Which sunscreens don't have oxybenzone or octinoxate?"
+    },
+    {
+      "id": "c-299",
+      "type": "category",
+      "brand": null,
+      "text": "Which SPF moisturizer is enough for an office job with no sun?"
+    },
+    {
+      "id": "c-300",
+      "type": "category",
+      "brand": null,
+      "text": "Which sunscreen works best over a vitamin C serum?"
+    },
+    {
+      "id": "c-301",
+      "type": "category",
+      "brand": null,
+      "text": "Which sunscreen is best for eczema-prone skin?"
+    },
+    {
+      "id": "c-302",
+      "type": "category",
+      "brand": null,
+      "text": "Which sunscreen brand is most trusted by dermatologists?"
+    },
+    {
+      "id": "c-303",
+      "type": "category",
+      "brand": null,
+      "text": "What's the best sunscreen I can grab at CVS tonight?"
+    },
+    {
+      "id": "c-304",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen deals right now \u2014 what's worth stocking up on?"
+    },
+    {
+      "id": "c-305",
+      "type": "category",
+      "brand": null,
+      "text": "Building a Sephora order \u2014 which SPF should I add?"
+    },
+    {
+      "id": "c-306",
+      "type": "category",
+      "brand": null,
+      "text": "One sunscreen for face and body for a minimalist \u2014 what do I buy?"
+    },
+    {
+      "id": "c-307",
+      "type": "category",
+      "brand": null,
+      "text": "What sunscreen should I put in my kid's summer camp bag?"
+    },
+    {
+      "id": "c-308",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen multipack for a family of five?"
+    },
+    {
+      "id": "c-309",
+      "type": "category",
+      "brand": null,
+      "text": "What travel-size sunscreen is TSA friendly and good?"
+    },
+    {
+      "id": "c-310",
+      "type": "category",
+      "brand": null,
+      "text": "I only buy clean beauty \u2014 which sunscreen qualifies?"
+    },
+    {
+      "id": "c-311",
+      "type": "category",
+      "brand": null,
+      "text": "What's the best subscription-worthy sunscreen I'll rebuy monthly?"
+    },
+    {
+      "id": "c-312",
+      "type": "category",
+      "brand": null,
+      "text": "Best sunscreen under $10 that dermatologists still approve of?"
+    }
+  ]
+}
