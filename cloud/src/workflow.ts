@@ -253,6 +253,12 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
         await updateJobResult(db, jobId, state);
       });
     } catch (e) {
+      // A deploy (wrangler deploy / secret put) resets the engine's Durable
+      // Object mid-run; the Workflows runtime then re-invokes run() and
+      // replays completed steps from cache -- transient, NOT a job failure.
+      // Tombstoning here would kill a job the platform is about to resume.
+      const msg = String(e instanceof Error ? e.message : e);
+      if (/Durable Object reset|code was updated/i.test(msg)) throw e;
       // api.py:267-269's rc!=0 branch: whole-job failure, not a per-row one
       state.status = 'error';
       state.stage = null;
