@@ -1,0 +1,254 @@
+{"id": "c-234", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "CeraVe", "Black Girl Sunscreen"]}
+{"id": "c-238", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-246", "regex_labels": ["Neutrogena", "CeraVe", "Coppertone", "Black Girl Sunscreen"]}
+{"id": "c-240", "regex_labels": ["La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-235", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-242", "regex_labels": []}
+{"id": "c-237", "regex_labels": ["Neutrogena", "EltaMD", "CeraVe"]}
+{"id": "c-233", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "CeraVe", "Black Girl Sunscreen"]}
+{"id": "c-252", "regex_labels": []}
+{"id": "c-236", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "CeraVe", "Black Girl Sunscreen"]}
+{"id": "c-239", "regex_labels": ["Supergoop", "Neutrogena", "EltaMD", "Black Girl Sunscreen"]}
+{"id": "c-244", "regex_labels": ["Neutrogena", "Coppertone"]}
+{"id": "c-250", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "Coppertone"]}
+{"id": "c-247", "regex_labels": ["Neutrogena"]}
+{"id": "c-248", "regex_labels": ["EltaMD", "Coppertone"]}
+{"id": "c-243", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-249", "regex_labels": ["La Roche-Posay", "EltaMD", "Coppertone"]}
+{"id": "c-258", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-245", "regex_labels": ["Supergoop", "EltaMD"]}
+{"id": "c-256", "regex_labels": ["Supergoop", "EltaMD"]}
+{"id": "c-241", "regex_labels": ["Supergoop", "La Roche-Posay"]}
+{"id": "c-255", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-251", "regex_labels": ["La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-253", "regex_labels": ["La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-254", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "CeraVe", "Black Girl Sunscreen"]}
+{"id": "c-263", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-259", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-265", "regex_labels": ["Supergoop", "Neutrogena", "EltaMD"]}
+{"id": "c-257", "regex_labels": []}
+{"id": "c-267", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-264", "regex_labels": ["CeraVe"]}
+{"id": "c-268", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-260", "regex_labels": ["Supergoop", "Sun Bum", "La Roche-Posay", "EltaMD", "Coppertone", "Black Girl Sunscreen"]}
+{"id": "c-266", "regex_labels": ["Sun Bum", "Neutrogena", "La Roche-Posay", "Coppertone"]}
+{"id": "c-272", "regex_labels": ["Supergoop", "Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD", "Coppertone", "Black Girl Sunscreen"]}
+{"id": "c-276", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-261", "regex_labels": ["La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-269", "regex_labels": ["La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-277", "regex_labels": ["Supergoop", "Neutrogena", "EltaMD"]}
+{"id": "c-271", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "Black Girl Sunscreen"]}
+{"id": "c-273", "regex_labels": ["Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe", "Coppertone", "Black Girl Sunscreen"]}
+{"id": "c-274", "regex_labels": ["Supergoop", "Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe", "Coppertone", "Black Girl Sunscreen"]}
+{"id": "c-262", "regex_labels": ["Neutrogena", "La Roche-Posay"]}
+{"id": "c-282", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-278", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-270", "regex_labels": []}
+{"id": "c-279", "regex_labels": ["Supergoop", "Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe", "Coppertone", "Black Girl Sunscreen"]}
+{"id": "c-284", "regex_labels": ["Neutrogena", "Coppertone"]}
+{"id": "c-285", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "Black Girl Sunscreen"]}
+{"id": "c-275", "regex_labels": ["Sun Bum", "La Roche-Posay", "Black Girl Sunscreen"]}
+{"id": "c-286", "regex_labels": ["Supergoop", "Sun Bum", "La Roche-Posay", "EltaMD"]}
+{"id": "c-291", "regex_labels": ["Supergoop", "Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD", "Coppertone"]}
+{"id": "c-289", "regex_labels": ["Neutrogena", "EltaMD", "Coppertone"]}
+{"id": "c-292", "regex_labels": []}
+{"id": "c-288", "regex_labels": ["Supergoop", "Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD", "Coppertone"]}
+{"id": "c-287", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-293", "regex_labels": []}
+{"id": "c-280", "regex_labels": ["Supergoop", "La Roche-Posay", "Black Girl Sunscreen"]}
+{"id": "c-290", "regex_labels": ["Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-295", "regex_labels": []}
+{"id": "c-281", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-299", "regex_labels": []}
+{"id": "c-283", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-301", "regex_labels": ["La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-297", "regex_labels": []}
+{"id": "c-296", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-302", "regex_labels": ["Neutrogena", "EltaMD", "CeraVe"]}
+{"id": "c-309", "regex_labels": ["Supergoop", "Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD", "Coppertone"]}
+{"id": "c-303", "regex_labels": ["Neutrogena", "La Roche-Posay"]}
+{"id": "c-298", "regex_labels": ["Supergoop", "Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-305", "regex_labels": []}
+{"id": "c-300", "regex_labels": []}
+{"id": "c-306", "regex_labels": ["Supergoop", "La Roche-Posay"]}
+{"id": "c-308", "regex_labels": ["Supergoop", "Neutrogena"]}
+{"id": "c-311", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-310", "regex_labels": ["Supergoop"]}
+{"id": "c-312", "regex_labels": ["Neutrogena"]}
+{"id": "c-294", "regex_labels": []}
+{"id": "c-304", "regex_labels": ["Supergoop", "Neutrogena", "EltaMD", "Coppertone"]}
+{"id": "c-307", "regex_labels": ["Sun Bum", "Neutrogena", "CeraVe", "Coppertone"]}
+{"id": "c-092", "regex_labels": []}
+{"id": "c-083", "regex_labels": []}
+{"id": "c-095", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-085", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-086", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "CeraVe", "Black Girl Sunscreen"]}
+{"id": "c-081", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-082", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-084", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-091", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe", "Black Girl Sunscreen"]}
+{"id": "c-094", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-089", "regex_labels": ["La Roche-Posay", "EltaMD", "CeraVe", "Coppertone"]}
+{"id": "c-090", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-088", "regex_labels": ["EltaMD", "CeraVe"]}
+{"id": "c-098", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-087", "regex_labels": ["Neutrogena", "La Roche-Posay", "CeraVe"]}
+{"id": "c-100", "regex_labels": ["La Roche-Posay", "EltaMD"]}
+{"id": "c-102", "regex_labels": ["La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-103", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-105", "regex_labels": ["La Roche-Posay", "EltaMD"]}
+{"id": "c-106", "regex_labels": ["La Roche-Posay", "EltaMD"]}
+{"id": "c-096", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-101", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-109", "regex_labels": ["Supergoop", "EltaMD", "CeraVe", "Black Girl Sunscreen"]}
+{"id": "c-112", "regex_labels": ["Neutrogena", "La Roche-Posay", "Coppertone"]}
+{"id": "c-110", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "Black Girl Sunscreen"]}
+{"id": "c-097", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe", "Black Girl Sunscreen"]}
+{"id": "c-104", "regex_labels": ["Neutrogena", "CeraVe"]}
+{"id": "c-111", "regex_labels": []}
+{"id": "c-107", "regex_labels": ["La Roche-Posay", "EltaMD"]}
+{"id": "c-099", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-113", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-116", "regex_labels": ["Supergoop", "Sun Bum", "La Roche-Posay", "EltaMD", "Coppertone"]}
+{"id": "c-117", "regex_labels": []}
+{"id": "c-115", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe", "Coppertone", "Black Girl Sunscreen"]}
+{"id": "c-108", "regex_labels": ["Supergoop", "EltaMD", "Black Girl Sunscreen"]}
+{"id": "c-114", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "CeraVe", "Black Girl Sunscreen"]}
+{"id": "c-121", "regex_labels": ["Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD", "Coppertone"]}
+{"id": "c-120", "regex_labels": ["Supergoop", "Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-119", "regex_labels": ["Supergoop", "Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD", "Coppertone", "Black Girl Sunscreen"]}
+{"id": "c-122", "regex_labels": ["Supergoop", "Sun Bum", "Neutrogena", "La Roche-Posay", "Coppertone"]}
+{"id": "c-093", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-123", "regex_labels": ["Supergoop", "Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-125", "regex_labels": ["Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD", "Coppertone"]}
+{"id": "c-118", "regex_labels": ["Supergoop", "EltaMD", "Coppertone"]}
+{"id": "c-126", "regex_labels": ["Supergoop", "La Roche-Posay", "Coppertone"]}
+{"id": "c-127", "regex_labels": ["Supergoop", "Sun Bum", "Neutrogena", "La Roche-Posay", "Coppertone"]}
+{"id": "c-124", "regex_labels": ["Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-139", "regex_labels": []}
+{"id": "c-136", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "Black Girl Sunscreen"]}
+{"id": "c-129", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-130", "regex_labels": ["Sun Bum", "La Roche-Posay", "EltaMD"]}
+{"id": "c-131", "regex_labels": ["Supergoop", "Sun Bum", "Neutrogena", "La Roche-Posay", "Coppertone"]}
+{"id": "c-128", "regex_labels": ["Supergoop", "Neutrogena"]}
+{"id": "c-133", "regex_labels": ["Sun Bum", "Neutrogena", "EltaMD", "Coppertone"]}
+{"id": "c-140", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "Black Girl Sunscreen"]}
+{"id": "c-138", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "CeraVe"]}
+{"id": "c-142", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-132", "regex_labels": ["La Roche-Posay", "EltaMD", "Coppertone"]}
+{"id": "c-135", "regex_labels": ["Supergoop", "EltaMD", "Black Girl Sunscreen"]}
+{"id": "c-150", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-147", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-144", "regex_labels": []}
+{"id": "c-148", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-143", "regex_labels": ["CeraVe"]}
+{"id": "c-152", "regex_labels": ["Neutrogena", "EltaMD"]}
+{"id": "c-146", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-141", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-145", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-155", "regex_labels": ["Sun Bum", "Neutrogena", "La Roche-Posay", "CeraVe", "Coppertone", "Black Girl Sunscreen"]}
+{"id": "c-154", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-137", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay"]}
+{"id": "c-149", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-158", "regex_labels": ["Neutrogena", "La Roche-Posay", "CeraVe", "Coppertone"]}
+{"id": "c-151", "regex_labels": ["La Roche-Posay", "EltaMD"]}
+{"id": "c-134", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "Coppertone"]}
+{"id": "c-160", "regex_labels": ["Neutrogena", "Coppertone"]}
+{"id": "c-157", "regex_labels": ["Neutrogena", "La Roche-Posay", "CeraVe", "Coppertone"]}
+{"id": "c-159", "regex_labels": ["Sun Bum", "Neutrogena", "EltaMD"]}
+{"id": "c-156", "regex_labels": ["Neutrogena", "La Roche-Posay", "CeraVe", "Coppertone", "Black Girl Sunscreen"]}
+{"id": "c-168", "regex_labels": ["Neutrogena", "La Roche-Posay", "CeraVe", "Coppertone", "Black Girl Sunscreen"]}
+{"id": "c-162", "regex_labels": ["Supergoop"]}
+{"id": "c-153", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay"]}
+{"id": "c-165", "regex_labels": []}
+{"id": "c-172", "regex_labels": ["Neutrogena", "CeraVe", "Coppertone"]}
+{"id": "c-167", "regex_labels": ["La Roche-Posay", "Coppertone"]}
+{"id": "c-173", "regex_labels": ["Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe", "Coppertone", "Black Girl Sunscreen"]}
+{"id": "c-174", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe", "Coppertone", "Black Girl Sunscreen"]}
+{"id": "c-169", "regex_labels": ["Neutrogena", "Coppertone"]}
+{"id": "c-171", "regex_labels": ["Neutrogena", "CeraVe"]}
+{"id": "c-170", "regex_labels": ["Neutrogena", "Coppertone"]}
+{"id": "c-176", "regex_labels": []}
+{"id": "c-175", "regex_labels": []}
+{"id": "c-163", "regex_labels": ["Supergoop", "La Roche-Posay", "Black Girl Sunscreen"]}
+{"id": "c-181", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-179", "regex_labels": []}
+{"id": "c-166", "regex_labels": ["La Roche-Posay", "EltaMD", "Coppertone", "Black Girl Sunscreen"]}
+{"id": "c-177", "regex_labels": ["Neutrogena", "EltaMD", "CeraVe"]}
+{"id": "c-178", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-180", "regex_labels": ["Neutrogena", "CeraVe"]}
+{"id": "c-183", "regex_labels": ["Neutrogena", "CeraVe", "Coppertone"]}
+{"id": "c-182", "regex_labels": ["Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-184", "regex_labels": ["Neutrogena", "EltaMD", "Coppertone"]}
+{"id": "c-164", "regex_labels": ["La Roche-Posay", "CeraVe", "Black Girl Sunscreen"]}
+{"id": "c-161", "regex_labels": ["Supergoop"]}
+{"id": "c-191", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-186", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe", "Black Girl Sunscreen"]}
+{"id": "c-185", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "Black Girl Sunscreen"]}
+{"id": "c-199", "regex_labels": ["EltaMD"]}
+{"id": "c-196", "regex_labels": ["Supergoop", "Neutrogena", "EltaMD", "Black Girl Sunscreen"]}
+{"id": "c-194", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-197", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "CeraVe", "Black Girl Sunscreen"]}
+{"id": "c-190", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-189", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-192", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-198", "regex_labels": ["La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-201", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-193", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-202", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe", "Black Girl Sunscreen"]}
+{"id": "c-200", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-195", "regex_labels": ["Supergoop", "La Roche-Posay", "CeraVe", "Black Girl Sunscreen"]}
+{"id": "c-187", "regex_labels": ["Supergoop"]}
+{"id": "c-211", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-208", "regex_labels": ["La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-204", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-210", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD", "Coppertone"]}
+{"id": "c-207", "regex_labels": ["La Roche-Posay", "EltaMD"]}
+{"id": "c-205", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-206", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-212", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-216", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-209", "regex_labels": ["EltaMD"]}
+{"id": "c-214", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-215", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "Black Girl Sunscreen"]}
+{"id": "c-213", "regex_labels": ["La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-188", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-222", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-221", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-203", "regex_labels": ["EltaMD", "CeraVe"]}
+{"id": "c-224", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-232", "regex_labels": []}
+{"id": "c-225", "regex_labels": ["Supergoop", "La Roche-Posay", "Black Girl Sunscreen"]}
+{"id": "c-217", "regex_labels": ["Supergoop", "EltaMD"]}
+{"id": "c-226", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay"]}
+{"id": "c-218", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-231", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-219", "regex_labels": ["Supergoop", "EltaMD", "CeraVe"]}
+{"id": "c-228", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "c-230", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-229", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "c-227", "regex_labels": ["Supergoop"]}
+{"id": "c-223", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "c-220", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "cx-013", "regex_labels": ["La Roche-Posay"]}
+{"id": "cx-009", "regex_labels": []}
+{"id": "cx-014", "regex_labels": ["Sun Bum", "Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe", "Coppertone", "Black Girl Sunscreen"]}
+{"id": "cx-005", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "cx-015", "regex_labels": ["Supergoop", "Neutrogena", "EltaMD", "CeraVe"]}
+{"id": "cx-012", "regex_labels": ["La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "cx-007", "regex_labels": ["EltaMD"]}
+{"id": "cx-002", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "cx-004", "regex_labels": ["Supergoop"]}
+{"id": "cx-010", "regex_labels": ["EltaMD", "CeraVe"]}
+{"id": "cx-020", "regex_labels": []}
+{"id": "cx-019", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD", "CeraVe", "Coppertone", "Black Girl Sunscreen"]}
+{"id": "cx-006", "regex_labels": ["La Roche-Posay", "EltaMD", "CeraVe"]}
+{"id": "cx-016", "regex_labels": ["Neutrogena", "Coppertone"]}
+{"id": "cx-008", "regex_labels": ["Supergoop", "Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "cx-003", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "Black Girl Sunscreen"]}
+{"id": "cx-011", "regex_labels": ["La Roche-Posay", "EltaMD"]}
+{"id": "cx-018", "regex_labels": ["Neutrogena", "Coppertone"]}
+{"id": "cx-001", "regex_labels": ["Neutrogena", "La Roche-Posay", "EltaMD"]}
+{"id": "cx-021", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD", "CeraVe", "Black Girl Sunscreen"]}
+{"id": "cx-017", "regex_labels": ["Supergoop", "La Roche-Posay", "EltaMD"]}
+{"id": "cx-022", "regex_labels": ["Neutrogena", "Coppertone", "Black Girl Sunscreen"]}

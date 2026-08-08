@@ -1,0 +1,43 @@
+{
+  // Margin API + measurement Workflow, as a single Worker (src/api.ts routes,
+  // src/workflow.ts does the work). Mirrors api.py's single-process FastAPI
+  // app -- one deployable, same as the Python version.
+  "name": "margin",
+  "main": "src/api.ts",
+  // bump to today before every deploy; pinned here so `wrangler deploy` is
+  // reproducible. Workflows require a date on/after their GA (2024-09-23).
+  "compatibility_date": "2026-08-01",
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "margin",
+      "database_id": "7235feb6-5d26-4945-a378-e1c094ed64e6"
+    }
+  ],
+
+  "workflows": [
+    {
+      "name": "margin-measure",
+      "binding": "MEASURE",
+      "class_name": "MeasureWorkflow"
+    }
+  ],
+
+  "assets": {
+    // put the built console here (console.html / margin-console.html, output
+    // of build_console.py) before deploying -- served at GET / via env.ASSETS
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+
+  "vars": {
+    "EVEROS_BASE_URL": "https://api.evermind.ai"
+  }
+
+  // secrets (never in this file -- `wrangler secret put <NAME>`):
+  //   MARGIN_TOKENS     "tenant:secret,tenant2:secret2" -- HTTP Basic user:pass -> tenant map
+  //   EVEROS_API_KEY    optional -- unset means memory writes stay D1-local (no EverOS push)
+  //   OPENAI_API_KEY    optional -- fallback key for a "house" tenant; normal
+  //                     path is BYOK, the client sends openai_key in the POST /jobs body
+}

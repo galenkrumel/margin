@@ -182,8 +182,6 @@
 
   <div id="drill"></div>
 
-  <div id="memory"></div>
-
   <div class="footnote">
     Intervals are Wilson score, 95%. Stopping decisions are evaluated after each
     scored batch of <span id="fn-batch"></span>; sequential stopping without
@@ -529,13 +527,9 @@ function samplesPanel(j) {
     <div class="sub">Straight from responses.jsonl, unedited.</div>${items}</div>`;
 }
 
-/* ---------------- memory: what Margin remembers ---------------- */
-function memChip(mode) {
-  if (mode === 'live')   return `<span class="chip good"><span class="dot"></span>EverOS Cloud — live</span>`;
-  if (mode === 'cached') return `<span class="chip info"><span class="dot"></span>EverOS — cached (recorded live traffic)</span>`;
-  return `<span class="chip warn"><span class="dot"></span>local mirror — EverOS push pending</span>`;
-}
-
+/* ---------------- memory: what Margin remembers ----------------
+   No panel of its own: memory shows up as the remembered tag on the job it
+   certified, and as the sharpened interval on a warm-started re-run. */
 const tfmt = ts => new Date(ts * 1000).toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
 
 /* Every remembered baseline is a job that ran, so the Jobs table is the one
@@ -560,17 +554,6 @@ async function refreshMemory() {
   if (!Array.isArray(recs) || !recs.length) return;
   recs.forEach(b => MEM[b.job_id] = b);        // newest write per job_id wins
   renderJobs();
-}
-
-function renderMemory() {
-  const m = DATA.memory;
-  if (!m) return;
-  document.getElementById('memory').innerHTML =
-    `<h2 style="display:flex;align-items:center;gap:12px">Memory
-       ${memChip(m.mode)}</h2>
-     <div class="sub">Every certified result above is written to EverOS, EverMind's memory
-       layer, as the agent's statistical memory — the <b>remembered</b> tag on a job marks
-       when it landed, and a re-run warm-starts from it: same budget, tighter interval.</div>`;
 }
 
 /* ---------------- live job launcher (http only — POST /jobs on this server) */
@@ -833,9 +816,17 @@ async function renderLiveRows() {
   if (!Array.isArray(list)) return;
   LIVE = list;
   renderJobs();
+  if (boot && list.length) {   // open on the newest run, not the curated hero
+    boot = false;
+    const newest = list.reduce((a, b) => (+String(b.id).split('_')[1] || 0)
+                                       > (+String(a.id).split('_')[1] || 0) ? b : a);
+    ljPolling = newest.id;     // pre-set: pollJob only scrolls when the selection changes
+    pollJob(newest.id);
+  }
   if (list.some(s => s.status !== 'done' && s.status !== 'error'))
     setTimeout(renderLiveRows, 3000);
 }
+let boot = true;   // first /jobs answer picks the default selection; later ones must not
 
 let ljPolling = null;   // only the newest requested job keeps its poll loop alive
 
@@ -893,10 +884,9 @@ async function pollJob(id) {
 
 document.getElementById('fn-batch').textContent = DATA.batch;
 renderJobs();
-select(0);
-renderMemory();
+select(0);        // offline artifact stays here; the live server overrides it below
 refreshMemory();
-renderLaunch();
+renderLaunch();   // -> renderLiveRows() -> opens on the newest live run
 </script>
 </body>
 </html>

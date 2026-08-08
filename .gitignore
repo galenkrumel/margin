@@ -2,9 +2,10 @@
 .env
 .env.*
 
-# job runs / artifacts
-jobs/
-memory/*.jsonl
+# job runs / artifacts -- curated jobs/ and the live_* fixture dirs ARE
+# committed: cloud/test/golden.test.ts replays them, so they're test fixtures
+# now, not disposable output. everos_log.jsonl stays local (raw API traffic).
+memory/everos_log.jsonl
 *.log
 
 # generated console (built from console.html by build_console.py)

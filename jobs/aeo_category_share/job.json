@@ -1,0 +1,78 @@
+{
+  "job_id": "aeo_category_share",
+  "description": "Category share of voice: unbranded shopping questions \u2014 is Supergoop recommended?",
+  "measured": {
+    "model": "gpt-5",
+    "web_search": true,
+    "max_output_tokens": 3000,
+    "reasoning_effort": "low"
+  },
+  "metric": {
+    "name": "supergoop_category_share",
+    "aggregate_field": "target_recommended",
+    "scorer": {
+      "type": "llm_judge",
+      "model": "gpt-4o-mini",
+      "system": "You label AI shopping responses. You get a response text and a list of canonical sunscreen brand names. Return STRICT JSON, nothing else:\n{\"brands_recommended\": [...], \"brands_mentioned\": [...], \"target_recommended\": true/false}\n\n- brands_mentioned: canonical names (from the provided list ONLY) that appear in the text in any way.\n- brands_recommended: subset of mentioned that the response presents positively as an option to buy/use. Exclude brands that are dismissed, criticized, or named only as a comparison loser.\n- target_recommended: whether the TARGET brand (Supergoop) is in brands_recommended.\nUse ONLY canonical names exactly as given. If none, use empty lists and false.\n\nTARGET brand: Supergoop\nCanonical brands: [\"Supergoop\", \"Sun Bum\", \"Neutrogena\", \"La Roche-Posay\", \"EltaMD\", \"CeraVe\", \"Coppertone\", \"Black Girl Sunscreen\"]",
+      "fields": {
+        "brands_recommended": "list",
+        "brands_mentioned": "list",
+        "target_recommended": "bool"
+      }
+    },
+    "labels": [
+      "Supergoop",
+      "Sun Bum",
+      "Neutrogena",
+      "La Roche-Posay",
+      "EltaMD",
+      "CeraVe",
+      "Coppertone",
+      "Black Girl Sunscreen"
+    ],
+    "leaderboard_field": "brands_recommended",
+    "mention_field": "brands_mentioned",
+    "regex_validator": {
+      "Supergoop": [
+        "supergoop",
+        "super goop",
+        "unseen sunscreen",
+        "glowscreen",
+        "mineral sheerscreen",
+        "play everyday"
+      ],
+      "Sun Bum": [
+        "sun bum",
+        "sunbum"
+      ],
+      "Neutrogena": [
+        "neutrogena",
+        "ultra sheer dry-touch",
+        "ultra sheer dry touch",
+        "hydro boost spf"
+      ],
+      "La Roche-Posay": [
+        "la roche-posay",
+        "la roche posay",
+        "anthelios"
+      ],
+      "EltaMD": [
+        "eltamd",
+        "elta md",
+        "uv clear",
+        "uv daily"
+      ],
+      "CeraVe": [
+        "cerave",
+        "cera ve"
+      ],
+      "Coppertone": [
+        "coppertone"
+      ],
+      "Black Girl Sunscreen": [
+        "black girl sunscreen",
+        "bgs spf"
+      ]
+    }
+  }
+}

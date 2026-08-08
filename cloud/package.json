@@ -1,0 +1,17 @@
+{
+  "name": "margin-cloud",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "seed:local": "node seed/seed.mjs && wrangler d1 execute margin --local --file=seed/seed.sql"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260808.1",
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0",
+    "wrangler": "^4.120.0"
+  }
+}
