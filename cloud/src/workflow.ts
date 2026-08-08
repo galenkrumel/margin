@@ -13,7 +13,7 @@ import {
   initialJobState, latestBaseline, updateJobResult,
   listResponses, insertResponses, listScores, insertScores, insertMeasurement,
 } from './db';
-import { priorFromBaseline, decide, canAfford, DRIFT_Z } from './stats';
+import { priorFromBaseline, decide, canAfford, seededShuffle, DRIFT_Z } from './stats';
 import { REGISTRY, coerce } from './scorers';
 import { generate, judge } from './openai';
 
@@ -48,7 +48,9 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
     const db = this.env.DB;
     const metric = requested.metric;
     const aggField = metric.aggregate_field;
-    const queries = normalizePrompts(requested.prompts);
+    // qids come from normalizePrompts BEFORE the shuffle so ids stay tied to
+    // the original prompt index (intended: only the sampling order moves)
+    const queries = seededShuffle(normalizePrompts(requested.prompts), jobId);
     const cap = Math.min(requested.budget.max_executions, queries.length);   // api.py:254
 
     const state: JobState = initialJobState(jobId, requested);
@@ -165,7 +167,14 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
         });
 
         // ---- Wilson/credible + stop rule -- plain math, NOT a step (api.py:271-301) --
-        const scored = (await listScores(db, jobId)).filter(s => s.score !== null);   // api.py:129 skips score==null
+        // failed calls are invisible to n/k below (they never scored) but not
+        // to the stop reason -- a run that failed calls didn't "exhaust" the
+        // population, it just stopped trying.
+        const [respRows, scoreRows] = await Promise.all([listResponses(db, jobId), listScores(db, jobId)]);
+        const genFailed = respRows.filter(r => !r.ok).length;
+        const scored = scoreRows.filter(s => s.score !== null);   // api.py:129 skips score==null
+        const judgeFailed = scoreRows.length - scored.length;
+        const failed = genFailed + judgeFailed;
         const n = scored.length;
         const k = scored.filter(s => s.flag).length;
         const cost = scored.reduce((c, s) => c + (s.gen_cost || 0) + (s.judge_cost || 0), 0);
@@ -193,6 +202,19 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
         state.cost_usd = round4(cost);
         state.cost_naive_usd = perQ ? round4(perQ * queries.length) : null;   // api.py:288
         state.trajectory = [...state.trajectory, { n, p: d.estimate, lo: d.lo, hi: d.hi }];   // api.py:289
+        state.failures = failed ? { generate: genFailed, judge: judgeFailed } : null;
+
+        if (d.stop === 'population_exhausted' && failed > attempted * 0.1) {
+          // ponytail: >10% failed calls makes "population exhausted" a lie -- error
+          // out with the partial numbers kept; `remember` skips non-done jobs, so a
+          // failure-riddled run never becomes a warm-start baseline. tune if noisy.
+          state.status = 'error';
+          state.stop_reason = null;
+          state.stage = null;
+          state.error = `${genFailed}/${attempted} generate and ${judgeFailed}/${scoreRows.length} judge calls failed after retries -- partial result at n=${n}`;
+          await updateJobResult(db, jobId, state);
+          break;
+        }
 
         if (d.stop) {
           state.status = 'done';

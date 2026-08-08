@@ -91,6 +91,7 @@ export interface JobState {   // api.py:316-322 (create) + :286-301 (per-batch u
   interval: 'wilson' | 'credible';
   requested: RequestedJob;
   memory?: { ok: boolean; mode: string; status?: number; error?: string } | null;   // api.py:218 run_job()
+  failures: { generate: number; judge: number } | null;   // visible error accounting, cloud-only addition
 }
 
 /** api.py:316-322 -- the record a brand-new job starts life as. Shared by
@@ -102,7 +103,7 @@ export function initialJobState(id: string, requested: RequestedJob): JobState {
     executions_used: 0, k: 0, estimate: null, ci: null, ci_width: null,
     cost_usd: 0, cost_naive_usd: null, population: requested.prompts.length,
     trajectory: [], stop_reason: null, error: null,
-    memory_prior: null, interval: 'wilson', requested,
+    memory_prior: null, interval: 'wilson', requested, failures: null,
   };
 }
 

@@ -182,8 +182,12 @@ describe("live jobs -- golden replay vs mirror.jsonl", () => {
     // always reports k/n. So we assert against k/n, not rec.rate, and only
     // check the CI (which the display-rule change never touched).
     expect(last.estimate).toBeCloseTo(k / n, 4);
-    expect(last.lo).toBeCloseTo(rec.ci_lo, 4);
-    expect(last.hi).toBeCloseTo(rec.ci_hi, 4);
+    // NOTE 2: the recorded ci [0, 0.0694] used the normal approx to
+    // Beta(1,41), which is too narrow at the k=0 boundary. betaCi now uses
+    // the exact closed-form quantiles there (deliberate divergence from the
+    // mirror) -- assert those. Same target (width 0.1): stop is unchanged.
+    expect(last.lo).toBeCloseTo(1 - Math.pow(0.975, 1 / 41), 6);
+    expect(last.hi).toBeCloseTo(1 - Math.pow(0.025, 1 / 41), 6);
     expect(rec.prior_n_eff).toBe(Math.round(20 * Math.min(1, 25 / 20)));
   });
 
@@ -203,8 +207,10 @@ describe("live jobs -- golden replay vs mirror.jsonl", () => {
     expect(last.drift).toBe(false);
     expect(stop).toBe("precision_met");
     expect(last.estimate).toBeCloseTo(k / n, 4); // same display-rule note as above
-    expect(last.lo).toBeCloseTo(rec.ci_lo, 4);
-    expect(last.hi).toBeCloseTo(rec.ci_hi, 4);
+    // same NOTE 2 as above: exact Beta(1,41) quantiles, not the recorded
+    // normal-approx ci -- deliberate divergence, stop point unchanged.
+    expect(last.lo).toBeCloseTo(1 - Math.pow(0.975, 1 / 41), 6);
+    expect(last.hi).toBeCloseTo(1 - Math.pow(0.025, 1 / 41), 6);
   });
 
   it("live_1786138212: fresh, no prior -- population_exhausted at n=120", () => {

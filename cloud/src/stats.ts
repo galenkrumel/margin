@@ -22,6 +22,12 @@ export function nForWidth(p: number, w: number, z = Z): number {
 /** Normal approx to Beta credible interval (memory_stats.py's beta_ci / api.py's _beta_ci). */
 export function betaCi(a: number, b: number): [m: number, lo: number, hi: number] {
   const m = a / (a + b);
+  // normal approx is worst exactly at a==1 or b==1 (a zero-count prior/count
+  // at k=0 or k=n) -- Beta(1,b)/Beta(a,1) have closed-form CDFs (1-(1-x)^b,
+  // x^a), so use the exact quantiles there instead. a===1&&b===1 (uniform)
+  // falls into the first branch and correctly yields [0.025, 0.975].
+  if (a === 1) return [m, 1 - Math.pow(0.975, 1 / b), 1 - Math.pow(0.025, 1 / b)];
+  if (b === 1) return [m, Math.pow(0.025, 1 / a), Math.pow(0.975, 1 / a)];
   const h = 1.96 * Math.sqrt((a * b) / ((a + b) ** 2 * (a + b + 1)));
   return [m, Math.max(0.0, m - h), Math.min(1.0, m + h)];
 }
@@ -37,6 +43,26 @@ export function priorFromBaseline(baseline: { n: number; k: number; rate: number
 } {
   const scale = Math.min(1.0, PRIOR_CAP / baseline.n);
   return { a0: 1 + baseline.k * scale, b0: 1 + (baseline.n - baseline.k) * scale };
+}
+
+/** deterministic Fisher–Yates seeded by jobId -- prompts arrive grouped by
+ * topic, so in-order sampling measures an unrepresentative head of the
+ * population. seeded, not Math.random: step retries must see the same order.
+ * (lives here, not workflow.ts: pure + testable without the workers runtime) */
+export function seededShuffle<T>(items: T[], seed: string): T[] {
+  let h = 2166136261 >>> 0;   // FNV-1a into a splitmix-ish stream
+  for (let i = 0; i < seed.length; i++) h = Math.imul(h ^ seed.charCodeAt(i), 16777619);
+  const rand = () => {
+    h = Math.imul(h ^ (h >>> 15), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    return ((h ^= h >>> 16) >>> 0) / 4294967296;
+  };
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
 }
 
 export interface DecideInput {
