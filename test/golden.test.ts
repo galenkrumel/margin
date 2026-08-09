@@ -9,8 +9,11 @@ import { describe, expect, it } from "vitest";
 import { canAfford, decide, priorFromBaseline, wilson, type DecideResult } from "../src/stats.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = join(__dirname, "..", "..");
-const JOBS = join(REPO_ROOT, "jobs");
+// fixtures/ is frozen recorded output of the (now-deleted) Python engine: the
+// runs these tests replay. Nothing writes here -- see fixtures/README.md.
+const FIXTURES = join(__dirname, "..", "fixtures");
+const JOBS = join(FIXTURES, "jobs");
+const MIRROR = join(FIXTURES, "mirror.jsonl");
 
 function readJsonl(path: string): any[] {
   return readFileSync(path, "utf8")
@@ -29,7 +32,7 @@ function readJson(path: string): any {
 // the mirror instead, which is what stats.py's own selfcheck already proves
 // the formula produces) -------------------------------------------------
 describe("curated jobs -- headline Wilson numbers vs mirror.jsonl lines 1-3", () => {
-  const mirror = readJsonl(join(REPO_ROOT, "memory", "mirror.jsonl"));
+  const mirror = readJsonl(MIRROR);
 
   it("aeo_category_share: 131/254", () => {
     const rec = mirror.find((r) => r.job_id === "aeo_category_share");
@@ -144,7 +147,7 @@ function replay(
 }
 
 describe("live jobs -- golden replay vs mirror.jsonl", () => {
-  const mirror = readJsonl(join(REPO_ROOT, "memory", "mirror.jsonl"));
+  const mirror = readJsonl(MIRROR);
   const mirrorRec = (jobId: string) => mirror.find((r) => r.job_id === jobId);
 
   it("live_1786134788: fresh, no prior -- stops at n=20", () => {

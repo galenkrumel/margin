@@ -6,7 +6,7 @@
 // Also home for the two shared type blocks (Env, the STATE blob) that api.ts
 // and workflow.ts both need -- small enough that a separate types.ts would
 // just be one more file to open. D1Database/Fetcher/Workflow etc. are ambient
-// globals from @cloudflare/workers-types (wired up by cloud/tsconfig.json).
+// globals from @cloudflare/workers-types (wired up by tsconfig.json).
 
 // ---- Env --------------------------------------------------------------------
 

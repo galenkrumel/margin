@@ -1,14 +1,14 @@
-// Reads the curated (mode:"fresh") baselines out of memory/mirror.jsonl and
+// Reads the curated (mode:"fresh") baselines out of fixtures/mirror.jsonl and
 // emits seed.sql: idempotent INSERTs into the local D1 measurements table,
-// tenant 'house'. Plain Node, no deps -- run with `node seed/seed.mjs` from
-// cloud/, or `npm run seed:local` which also applies the file.
+// tenant 'house'. Plain Node, no deps -- run with `node seed/seed.mjs` from the
+// repo root, or `npm run seed:local` which also applies the file.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const mirrorPath = join(here, '..', '..', 'memory', 'mirror.jsonl');
+const mirrorPath = join(here, '..', 'fixtures', 'mirror.jsonl');
 const outPath = join(here, 'seed.sql');
 
 const FIXED = new Set(['metric', 'job_id', 'mode', 'model_version', 'n', 'k', 'rate', 'ci_lo', 'ci_hi', 'cost', 'ts']);

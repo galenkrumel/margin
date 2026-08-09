@@ -1,24 +1,27 @@
 // Worker fetch handler -- the Cloudflare replacement for api.py's FastAPI app.
-// Response shapes are copied field-for-field from api.py so console.html works
-// unmodified. Confirmed by reading api.py + grepping console.html for every
-// field it actually dereferences off these responses:
+// Response shapes are copied field-for-field from api.py so the console works
+// unmodified. Confirmed by grepping public/index.html for every field it
+// actually dereferences off these responses -- fields may be ADDED here, never
+// renamed or removed:
 //
 //   GET  /jobs, GET /jobs/:id -> s.id s.status s.stage s.executions_used s.k
 //     s.estimate s.ci[0] s.ci[1] s.ci_width s.cost_usd s.cost_naive_usd
 //     s.population s.trajectory s.stop_reason s.memory_prior s.interval
 //     s.requested.metric(.name) s.requested.measured.model
 //     s.requested.measured.web_search s.requested.precision.ci_width
-//     s.requested.prompts                              (console.html:247-882)
-//   POST /jobs -> (await r.json()).job_id                        (console.html:790-794)
-//   GET  /memory -> b.job_id b.ts b.interval b.prior_n_eff        (console.html:539-555)
+//     s.requested.prompts
+//   POST /jobs   -> (await r.json()).job_id
+//   GET  /memory -> b.job_id b.ts b.interval b.prior_n_eff
+//   GET  /console -> batch, checks, rates, rates_gen  (see src/console.ts)
 //
-// No framework (hono etc.) -- five routes and one auth check don't need one.
+// No framework (hono etc.) -- six routes and one auth check don't need one.
 
 import {
   type Env, type RequestedJob, type MetricConfig,
   initialJobState, createJob, getJob, listJobs, listMeasurements,
 } from './db';
 import { CHECKS } from './scorers';
+import { consolePayload } from './console';
 
 // wrangler requires Workflow classes to be exported from the entrypoint file
 // (this one, per wrangler.jsonc's "main") -- not just referenced by binding.
@@ -30,7 +33,7 @@ function json(body: unknown, status = 200): Response {
 
 /** "tenant:secret,tenant2:secret2" -> tenant for a matching HTTP Basic
  * username:password pair, or null. Applied to every /jobs and /memory route;
- * GET / (the console) skips it. Basic, not Bearer: console.html is a static
+ * GET / (the console) skips it. Basic, not Bearer: the console is a static
  * page whose fetch() calls send no Authorization header -- the browser has to
  * attach it for them, which it only does natively for Basic (after prompting).
  * Plain string equality is fine here -- these are per-tenant shared secrets
@@ -140,11 +143,13 @@ export default {
     const url = new URL(request.url);
 
     if (request.method === 'GET' && url.pathname === '/') {
-      return env.ASSETS.fetch(request);   // the built console -- api.py:349-353
+      return env.ASSETS.fetch(request);   // the console shell -- api.py:349-353
     }
 
-    const isJobsOrMemory = url.pathname === '/jobs' || url.pathname.startsWith('/jobs/') || url.pathname === '/memory';
-    if (isJobsOrMemory) {
+    // every route but the shell and its static assets is tenant-scoped
+    const isApi = url.pathname === '/jobs' || url.pathname.startsWith('/jobs/')
+      || url.pathname === '/memory' || url.pathname === '/console';
+    if (isApi) {
       const tenant = authTenant(request, env);
       if (!tenant) {
         return new Response(JSON.stringify({ detail: 'unauthorized' }), {
@@ -159,6 +164,9 @@ export default {
         return getJobRoute(env, tenant, decodeURIComponent(url.pathname.slice('/jobs/'.length)));
       }
       if (request.method === 'GET' && url.pathname === '/memory') return memoryRoute(env, tenant);
+      if (request.method === 'GET' && url.pathname === '/console') {
+        return json(await consolePayload(env.DB, tenant));
+      }
       return json({ detail: 'method not allowed' }, 405);
     }
 

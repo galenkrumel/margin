@@ -1,0 +1,44 @@
+# Test every push and PR; deploy main to Cloudflare.
+#
+# The deploy is the whole release process: `public/` is committed source and
+# there is no build step, so what CI uploads is exactly what is in the repo.
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # wrangler is already a devDependency -- no marketplace action needed.
+      - run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  # ponytail: no schema migration step -- schema.sql is applied by hand and has
+  # never changed. Add a `wrangler d1 migrations apply margin --remote` step
+  # here when the first ALTER lands.

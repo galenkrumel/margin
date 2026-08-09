@@ -1,29 +1,24 @@
 # secrets
 .env
 .env.*
+.dev.vars
 
-# job runs / artifacts -- curated jobs/ and the live_* fixture dirs ARE
-# committed: cloud/test/golden.test.ts replays them, so they're test fixtures
-# now, not disposable output. everos_log.jsonl stays local (raw API traffic).
-memory/everos_log.jsonl
+# node / wrangler
+node_modules/
+.wrangler/
 *.log
 
-# generated console (built from console.html by build_console.py)
+# demo-era artifacts, kept on disk, not in the repo
+memory/
 margin-console.html
-
-# scratch
+slides.html
+deck-artifact.html
+demo.mp4
 margin-hackathon-plan.md
 files.zip
 
-# python
-__pycache__/
-*.py[cod]
-.venv/
-venv/
-.pytest_cache/
-.ruff_cache/
+# local tooling state -- also holds a git worktree of the pre-TypeScript tree
+.claude/
 
 # macos
 .DS_Store
-.claude/settings.local.json
-slides.html

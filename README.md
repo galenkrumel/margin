@@ -1,77 +1,145 @@
-# Margin — demo runbook
+# Margin
 
-Precision-targeted measurement for stochastic systems. Spec: `margin-hackathon-plan.md`.
-Measured data lives in `jobs/` — **read-only**: never re-run `build_jobs.py` /
-`build_stratified_jobs.py` against it, they desync `population.json` from the responses.
-Statistical memory lives in `memory/mirror.jsonl` (local mirror of EverOS pushes) —
-regenerate only with `rm -rf memory && python3 memory_store.py --seed` then re-run the
-`--store` commands below, or the falling-cost chart loses its memory-assisted points.
+**Precision-targeted measurement for stochastic systems.** You state the precision you
+want — "the refusal rate, ±5 points, 95% confidence" — and Margin runs exactly as many
+model calls as that answer needs, then stops.
 
-## Demo (offline — no server, no network)
+![The Margin console: a metric launcher above a jobs table showing measured rate, 95% CI, executions used, and spend per run](docs/console.png)
 
-    python3 build_console.py && open margin-console.html
+## Why it exists
 
-Single ~1.1 MB file, Plotly inlined, opens from file://. This is slides 3–5:
-jobs list → convergence, price list, budget-cap demo, leaderboard, raw responses →
-memory panel (baselines, re-cert, change detection, falling-cost chart).
-If file:// fights the browser: `python3 -m http.server 8123` → localhost:8123/margin-console.html.
+Evaluating an LLM is a sampling problem, but it is almost never treated as one. The
+common practice is to pick a round number of prompts (100, 500, 1000), run them all,
+and report the resulting percentage with no interval — which means you cannot tell a
+real regression from sampling noise, and you routinely pay for hundreds of executions
+after the answer stopped changing.
 
-Slides: `open slides.html` (7 slides, arrows/click, `n` toggles speaker notes).
+Margin inverts that:
 
-## Memory (EverOS — sponsor beat)
+- **Precision is the input, sample size is the output.** Every run reports a Wilson
+  score interval and stops the moment its width hits your target — or the moment your
+  budget or the population runs out, whichever comes first. The stop reason is always
+  part of the result (`precision_met`, `budget_cap`, `population_exhausted`).
+- **Every run is priced before it runs.** The launcher quotes executions and dollars
+  from the remembered rate; the jobs table shows what each run actually spent.
+- **Measurements are remembered.** A finished run becomes a baseline. The next run of
+  the same metric warm-starts from it — the prior sharpens the interval (so re-certifying
+  is cheaper than certifying), and a drift guard discards the prior automatically when
+  fresh data disagrees with it, which is the system reporting a real change rather than
+  smoothing it away.
+- **The metric is config, not code.** A metric is a population of prompts, a scorer (an
+  LLM judge written from your definition, or a free deterministic check), and the boolean
+  field to aggregate. Nothing about the engine is specific to any one of them.
 
-    python3 memory_store.py --smoke     # one store + one recall round-trip
-    python3 memory_store.py --seed      # jobs/* baselines -> memory (console counting rule)
-    python3 memory_store.py --push      # replay the whole mirror to EverOS (run when EVEROS_API_KEY lands)
+## How it works
 
-    # warm-start re-cert (event run used jobs/recert_own_brand, 15 fresh gpt-5+search queries):
-    python3 memory_stats.py recert --job aeo_own_brand --scores-job recert_own_brand --draw 15 --store
-    # change-check vs remembered baseline (winner pilot: gpt-4o-mini+search, change confirmed −18.2pts @ n=60):
-    python3 memory_stats.py change --job pilot_mini --baseline-metric supergoop_category_share --store
+A job loops in batches. Each batch generates responses for the next `batch` prompts,
+scores them, and recomputes the interval; the loop then decides whether another batch
+can change the answer enough to be worth buying.
 
-Without `EVEROS_API_KEY` everything runs against the local mirror (mode `local`,
-labeled on the console badge); with the key, the same commands emit live EverOS
-traffic and cache responses to `memory/everos_log.jsonl` (the wifi-proof fallback).
-Rebuild the console after any `--store`/`--seed`: `python3 build_console.py`.
+    prompts + metric + precision + budget
+        └─ batch ─→ generate ─→ score ─→ interval ─→ stop? ──┐
+                        ↑                                    │ no
+                        └────────────────────────────────────┘
+                                                             │ yes
+                                              estimate, CI, cost, stop_reason
+                                                             │
+                                                        remembered as a
+                                                        baseline for next time
 
-## Operate (the live app)
+Each batch is a durable Workflow step, so a run survives retries, restarts, and
+mid-flight deploys; a resumed step skips the prompts it already completed.
 
-    ../margin-app2/venv/bin/uvicorn api:app --port 8000 > api.log 2>&1 &   # serves console at /
+The statistics are deliberately small and shared: one Wilson implementation, one
+sample-size formula, one Beta-posterior credible interval for warm-started runs.
 
-Open **localhost:8000** — the console gains a "Run a live job" panel (http-only; the
-file:// artifact stays a static report): prompts, metric preset, precision, budget →
-watch the convergence chart fill in live. New measurements pick a **scorer**: an LLM
-judge written from your definition, or a built-in check (`scorer.py` `CHECKS`, free and
-exact — the quote drops to generation-only). Add a check by adding it to both `REGISTRY`
-and `CHECKS`; the launcher menu and the API's validation follow automatically. API docs with a prefilled runnable example:
-**localhost:8000/docs** → POST /jobs → Try it out. Or curl:
+## Architecture
 
-    curl -s localhost:8000/openapi.json | python3 -c "import json,sys; print(json.dumps(json.load(sys.stdin)['components']['schemas']['JobRequest']['examples'][0]))" > /tmp/job.json
-    curl -s -X POST localhost:8000/jobs -H 'Content-Type: application/json' -d @/tmp/job.json
-    curl -s localhost:8000/jobs/<job_id>   # poll: {status, estimate, ci, executions_used, cost_usd, trajectory, ...}
+One Cloudflare Worker is the entire application — API, measurement engine, and
+console.
 
-Ready-made populations to upload: `prompts/*.txt` (one prompt per line, regenerate with
-`python3 make_prompt_packs.py`) — JSON compliance, prompt-injection resistance, and
-sycophancy, with the scorer and precision to pick for each in `prompts/README.md`.
+    src/api.ts         routes, tenant auth, D1 reads
+    src/workflow.ts    the batch loop as durable Workflow steps
+    src/stats.ts       Wilson, sample size, Beta credible interval, the stopping rule
+    src/scorers.ts     built-in deterministic checks + judge-score coercion
+    src/openai.ts      generation + judge clients, pricing, retry policy
+    src/db.ts          D1 queries (four tables, no ORM)
+    public/            the console, served at /
+    seed/              one-shot baseline import for a fresh database
+    test/              unit tests + golden replay against fixtures/
+    fixtures/          frozen recorded runs the tests replay (read-only)
+    prompts/           sample populations to upload
 
-Defaults are cheap (gpt-4o-mini, no search, $1 cap). Needs `OPENAI_API_KEY` (env or `.env`).
-Rebuild `margin-console.html` after template edits: `python3 build_console.py`.
+State lives in D1: `jobs` (one row per run, holding the full result blob the console
+polls), `responses` and `scores` (one row per prompt, so a retried step knows what it
+already did), and `measurements` (the baselines warm-start reads).
+
+## Run it locally
+
+    npm install
+    npx wrangler d1 execute margin --local --file=schema.sql
+    npm run seed:local        # optional: baselines so warm-start works day one
+    npx wrangler dev          # Workflows + D1 run locally under miniflare
+
+Then open the printed URL. The console's launcher takes a population of prompts, a
+metric, a precision target, and a budget, and shows the interval converging live.
+
+Callers bring their own OpenAI key (`openai_key` in the POST body); it lives only in
+Workflow params and is never written to the database or echoed back. Requests to
+`/jobs` and `/memory` need HTTP Basic credentials from the `MARGIN_TOKENS` secret
+(`tenant:secret,tenant2:secret2`), and every query is filtered by tenant. For local
+dev, put secrets in `.dev.vars`.
+
+Submitting a job by hand:
+
+    curl -s -X POST localhost:8787/jobs -u tenant:secret \
+      -H 'Content-Type: application/json' -d '{
+      "prompts": ["..."],
+      "metric": {"name": "json_compliance", "aggregate_field": "valid",
+                 "scorer": {"type": "function", "name": "json_valid"}},
+      "precision": {"ci_width": 0.10},
+      "budget": {"max_usd": 1.0, "max_executions": 200},
+      "openai_key": "sk-..."
+    }'
+    curl -s localhost:8787/jobs/<job_id> -u tenant:secret
+
+Defaults are cheap: `gpt-4o-mini`, no web search, $1 cap. Ready-made populations are in
+`prompts/` (JSON compliance, prompt-injection resistance, sycophancy, misconception
+affirmation) with the scorer and precision to pick for each in `prompts/README.md`.
+
+## API
+
+| Route | |
+|---|---|
+| `GET /` | the console (unauthenticated) |
+| `POST /jobs` | submit a measurement; returns `{job_id}` |
+| `GET /jobs` | this tenant's runs |
+| `GET /jobs/:id` | one run: status, estimate, ci, trajectory, cost, stop reason |
+| `GET /memory` | this tenant's remembered baselines |
+| `GET /console` | bootstrap for the console: built-in checks, batch size, measured $/query |
 
 ## Checks
 
-    python3 stats.py                 # interval math selfcheck
-    python3 build_console.py --check # console + memory numbers vs locked slide numbers
+    npm test          # unit tests + golden replay of recorded runs
+    npm run typecheck
 
-## Layout
+The golden replay is the one that matters: it re-runs five real measurement jobs
+batch-by-batch through the decision function and asserts the same trajectories and
+stop points. See `fixtures/README.md`.
 
-    stats.py          Wilson interval + price-list N (the one shared definition)
-    runner.py         generation engine (async, resumable, per-call cost ledger)
-    scorer.py         metric-as-config scorer (LLM judge or deterministic fn + regex validator)
-    memory_store.py   EverOS-backed MemoryStore + local mirror (--smoke/--seed/--push)
-    memory_stats.py   warm-start re-cert + change-check vs remembered baselines (--store)
-    make_pilot_job.py clone a population under a different measured model (pilots/re-certs)
-    make_prompt_packs.py  prompts/*.txt populations for the launcher's upload box
-    api.py            R1 job API + R4 stopping loop (shells out to runner/scorer)
-    build_console.py  jobs/*/ + memory/ -> every displayed number -> margin-console.html
-    console.html      console template (dark, single-file output)
-    analyze.py        CLI analysis / slide numbers (predates the console, kept as-is)
+## Deploy
+
+Pushing to `main` runs the checks and deploys
+([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)); it needs two
+repository secrets, `CLOUDFLARE_API_TOKEN` (an *Edit Cloudflare Workers* token) and
+`CLOUDFLARE_ACCOUNT_ID`. There is no build step — `public/` is committed source, so
+what CI uploads is what is in the repo.
+
+By hand, the same thing:
+
+    npx wrangler deploy
+
+Worker secrets are separate, and set once with `wrangler secret put`: `MARGIN_TOKENS`
+(required), `OPENAI_API_KEY` (optional house-key fallback), `EVEROS_API_KEY` (optional —
+without it, remembered measurements simply stay in D1). A fresh database needs
+`schema.sql` applied once with `wrangler d1 execute margin --remote --file=schema.sql`.

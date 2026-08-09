@@ -54,8 +54,6 @@
   .num { text-align: right; }
   .est { font-weight: 600; }
   .ci { color: var(--ink-2); font-size: 13px; }
-  tr.suppressed td { color: var(--muted); }
-  tr.suppressed .metric { color: var(--muted); font-weight: 500; }
   /* metric groups: a repeated metric collapses behind its newest run */
   tbody.stack:not(.open) tr.jrow { display: none; }
   tr.ghead { cursor: pointer; }
@@ -75,6 +73,7 @@
   .tip.r:hover::after, .tip.r:focus::after { left: auto; right: 0; }
 
   .cellsub { color: var(--muted); font-size: 12px; font-weight: 400; margin-top: 1px; }
+  td.empty { color: var(--muted); text-align: center; padding: 34px 14px; }
   .tablenote { color: var(--muted); font-size: 12.5px; margin-top: 10px; }
   .tablenote b { color: var(--ink-2); font-weight: 600; }
 
@@ -150,7 +149,7 @@
               border-top: 1px solid var(--grid); padding-top: 14px; }
   .footnote b { color: var(--ink-2); font-weight: 600; }
 </style>
-<script>/*__PLOTLY__*/</script>
+<script src="/plotly-basic.min.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -176,9 +175,9 @@
       <th>Status</th>
     </tr></thead>
   </table>
-  <div class="tablenote">Validation runs: every prompt in each population was executed once
-    so the stopping rule could be verified against ground truth. <b>Executions</b> shows
-    where a live Margin job would have stopped — <b>Spend</b>, what it would have billed.</div>
+  <div class="tablenote">Repeated metrics collapse into one group, newest run first.
+    <b>Executions</b> is where the stopping rule fired — <b>Spend</b>, what it billed
+    up to that point.</div>
 
   <div id="drill"></div>
 
@@ -187,13 +186,16 @@
     scored batch of <span id="fn-batch"></span>; sequential stopping without
     correction inflates error rates slightly (<b>named, not hidden</b> — production
     uses corrected sequential bounds). Judge is gpt-4o-mini at temperature 0,
-    validated against deterministic string matching. Every number on this page is
-    computed from completed measured runs on disk — nothing is simulated.
+    validated against deterministic string matching. Every number on this page comes
+    from a completed measured run — nothing is simulated.
   </div>
 </div>
 
 <script>
-const DATA = /*__DATA__*/null;
+/* Server-supplied constants, fetched once by init(). Defaults keep every
+   renderer safe if /console is unreachable -- the page degrades to "no quote"
+   rather than throwing. */
+let DATA = {batch: 20, checks: [], rates: {}, rates_gen: {}};
 
 const C = getComputedStyle(document.documentElement);
 const col = n => C.getPropertyValue(n).trim();
@@ -217,16 +219,9 @@ const PLOT_CFG = {displayModeBar: false, responsive: true};
 
 const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
-function statusChip(j) {
-  if (j.met) return `<span class="chip good"><span class="dot"></span>precision met</span>`;
-  return `<span class="chip warn"><span class="dot"></span>population exhausted</span>`;
-}
-
 /* ---------------- jobs list ----------------
-   One row builder for curated and live jobs alike: each entry carries its six
-   cells, so a metric group's header row is just its newest run's cells with a
-   different first column. Groups sort by newest run; curated runs predate every
-   live one, so they keep their curated order underneath. */
+   Each entry carries its six cells, so a metric group's header row is just its
+   newest run's cells with a different first column. Groups sort by newest run. */
 const JOB_TD = ['', 'num', 'num ci', 'num', 'num', ''];
 const jobRow = (attrs, cells) =>
   `<tr ${attrs}>${cells.map((c, i) => `<td class="${JOB_TD[i]}">${c}</td>`).join('')}</tr>`;
@@ -234,21 +229,6 @@ const jobRow = (attrs, cells) =>
 const cell0 = (metric, desc, sub) =>
   `<div class="metric">${metric}</div><div class="desc">${desc}</div>`
   + (sub ? `<div class="cellsub">${sub}</div>` : '');
-
-function curatedItem(j, i) {
-  const spend = j.stop < j.n
-    ? `<div class="est">${usd(j.cost_at_stop)}</div><div class="cellsub">fixed-N ${usd(j.cost)}</div>`
-    : `<div class="est">${usd(j.cost)}</div><div class="cellsub">= fixed-N</div>`;
-  return {metric: j.metric, ts: -i, desc: j.description,   // curated: no clock, keep hero first
-    attrs: `class="row jrow" id="row-${i}" onclick="select(${i})"`,
-    cells: [
-      cell0(j.metric, j.description,
-            `measured: ${j.model}${j.search ? ' + web search' : ''}${memBadge(j.id)}`),
-      `<div class="est">${pct(j.estimate)}</div><div class="cellsub">${j.k} of ${j.n} true</div>`,
-      `${pct(j.lo)} – ${pct(j.hi)} <span style="color:var(--muted)">(${pts(j.width)})</span>`,
-      `<div class="est">${j.met ? j.stop : j.n}</div><div class="cellsub">of ${j.pop} run</div>`,
-      spend, statusChip(j)]};
-}
 
 function liveItem(s) {
   const metric = esc(s.requested.metric.name || 'live job');
@@ -267,18 +247,7 @@ function liveItem(s) {
       usdSmart(s.cost_usd || 0), ljChip(s)]};
 }
 
-function suppressedItem() {
-  const s = DATA.suppressed;
-  const desc = `branded + unbranded prompts blended into one population — the blended rate
-    depends on the arbitrary mix, so Margin withholds the headline and splits it into the
-    two jobs above instead`;
-  return {metric: s.metric, ts: -1e6, desc, sup: true, attrs: 'class="suppressed jrow"',
-    cells: [cell0(s.metric, desc, ''), '—<div class="cellsub">mix-dependent</div>', '—',
-      `<div class="est">${s.n}</div><div class="cellsub">of ${s.n} run</div>`,
-      usd(s.cost), `<span class="chip info"><span class="dot"></span>headline withheld</span>`]};
-}
-
-let LIVE = [];                 // last /jobs payload; [] on the file:// artifact
+let LIVE = [];                 // last /jobs payload
 const jgOpen = new Set();      // metrics expanded -- survives the 3s live re-render
 let selId = null;              // selected row id, re-applied after every re-render
 
@@ -288,8 +257,14 @@ function toggleGroup(metric) {
 }
 
 function renderJobs() {
-  const items = DATA.jobs.map(curatedItem)
-    .concat(suppressedItem(), LIVE.map(liveItem));
+  const items = LIVE.map(liveItem);
+  const tblEl = document.getElementById('jobs-table');
+  if (!items.length) {   // fresh deployment: say so, don't render an empty grid
+    tblEl.querySelectorAll('tbody').forEach(t => t.remove());
+    tblEl.insertAdjacentHTML('beforeend', `<tbody><tr><td colspan="6" class="empty">
+      No measurements yet — launch one above and it will appear here.</td></tr></tbody>`);
+    return;
+  }
   const by = {};
   items.forEach(it => (by[it.metric] = by[it.metric] || []).push(it));
   const groups = Object.entries(by)
@@ -313,25 +288,10 @@ function renderJobs() {
 }
 
 /* ---------------- drill-down ---------------- */
-/* one selection bar for the whole table -- curated rows and live rows alike */
 function markSel(id, metric) {
   selId = id;
   if (metric) jgOpen.add(metric);   // a selected run is never hidden in a closed group
   renderJobs();
-}
-
-function select(i) {
-  markSel('row-' + i, DATA.jobs[i].metric);
-  ljPolling = null;              // a curated row takes the drill-down back from a live poll
-  const j = DATA.jobs[i];
-  const el = document.getElementById('drill');
-  el.innerHTML = tiles(j) + defPanel(j) + convergencePanel(j)
-    + (i === 0 ? pricePanel() + cappedPanel() : receiptPanel(j))
-    + (j.leaderboard ? leaderboardPanel(j) : '')
-    + (j.samples.length ? samplesPanel(j) : '');
-  drawConvergence(j);
-  if (i === 0) drawCapped();
-  if (j.leaderboard) drawLeaderboard(j);
 }
 
 function tiles(j) {
@@ -428,105 +388,6 @@ function drawConvergence(j, divId = 'conv') {
   }, PLOT_CFG);
 }
 
-function receiptPanel(j) {
-  const saved = 1 - j.cost_at_stop / j.cost;
-  return `<div class="panel">
-    <h3>Cost receipt — vs fixed-N</h3>
-    <div class="sub">The naive pipeline runs the full population every time. The measured
-      run below is real spend; the Margin line is the same run cut at the stopping rule.</div>
-    <table class="fintab"><thead>
-      <tr><th>pipeline</th><th class="num">executions</th><th class="num">cost</th><th class="num">Δ</th></tr>
-    </thead><tbody>
-      <tr><td>fixed-N (full population, measured)</td>
-          <td class="num">${j.n}</td><td class="num">${usd(j.cost)}</td><td class="num">—</td></tr>
-      <tr class="hl"><td>Margin (adaptive stop)</td>
-          <td class="num">${j.stop}</td><td class="num">${usd(j.cost_at_stop)}</td>
-          <td class="num">−${pct(saved, 0)}</td></tr>
-    </tbody></table></div>`;
-}
-
-function pricePanel() {
-  const rows = DATA.price_list.map(r => {
-    const cls = r.measured ? 'hl' : (r.feasible ? '' : 'dead');
-    const label = r.measured ? `${pts(r.width)} — measured` : pts(r.width);
-    const nCell = r.feasible ? r.n : `${r.n} — exceeds population`;
-    return `<tr class="${cls}"><td>${label}</td><td class="num">${nCell}</td>
-      <td class="num">${r.feasible ? usd(r.cost) : '—'}</td></tr>`;
-  }).join('');
-  return `<div class="panel">
-    <h3>The precision price list</h3>
-    <div class="sub">Computed from the measured rate and measured $/query. Certainty has a
-      price curve — Margin quotes it before you spend. The bottom row is a finding too:
-      the stated precision needs more prompts than the population holds.</div>
-    <table class="fintab"><thead>
-      <tr><th>precision</th><th class="num">executions needed</th><th class="num">price</th></tr>
-    </thead><tbody>${rows}</tbody></table></div>`;
-}
-
-function cappedPanel() {
-  const c = DATA.capped;
-  return `<div class="panel">
-    <h3>Budget cap — degraded, but honest</h3>
-    <div class="sub">The same job capped at ${c.n} executions (${usd(c.cost)}).
-      A fixed-N-by-vibes pipeline reports the point estimate as fact;
-      Margin reports what you actually know.</div>
-    <div id="capped" class="chart" style="height:170px"></div></div>`;
-}
-
-function drawCapped() {
-  const c = DATA.capped;
-  const rows = [
-    {y: 'full run', p: c.true_p, lo: c.true_lo, hi: c.true_hi, color: col('--deemph')},
-    {y: `capped at ${c.n}`, p: c.estimate, lo: c.lo, hi: c.hi, color: col('--accent')},
-  ];
-  Plotly.newPlot('capped', rows.map(r => ({
-    x: [r.p], y: [r.y], mode: 'markers',
-    marker: {size: 11, color: r.color, line: {color: col('--surface'), width: 2}},
-    error_x: {type: 'data', symmetric: false, array: [r.hi - r.p], arrayminus: [r.p - r.lo],
-              color: r.color, thickness: 2, width: 6},
-    hovertemplate: '%{y}: %{x:.1%}<extra></extra>',
-  })), {...BASE_LAYOUT, hovermode: 'closest',
-        margin: {...BASE_LAYOUT.margin, l: 100},
-        xaxis: {...BASE_LAYOUT.xaxis, tickformat: '.0%', range: [0, 1]},
-        yaxis: {...BASE_LAYOUT.yaxis, showgrid: false}}, PLOT_CFG);
-}
-
-function leaderboardPanel(j) {
-  return `<div class="panel">
-    <h3>Brand leaderboard — % of responses recommending each brand</h3>
-    <div class="sub">Share is defined over this customer's monitoring population.
-      One response can recommend several brands.</div>
-    <div id="lb" class="chart" style="height:${40 + j.leaderboard.length * 34}px"></div></div>`;
-}
-
-function drawLeaderboard(j) {
-  const lb = [...j.leaderboard].reverse();   // plotly draws bottom-up
-  Plotly.newPlot('lb', [{
-    type: 'bar', orientation: 'h',
-    y: lb.map(d => d.brand), x: lb.map(d => d.pct),
-    marker: {color: lb.map(d => d.target ? col('--accent') : col('--deemph'))},
-    text: lb.map(d => pct(d.pct)), textposition: 'outside',
-    textfont: {color: col('--ink-2'), size: 12},
-    hovertemplate: '%{y}: %{x:.1%} (%{customdata} of ' + j.n + ')<extra></extra>',
-    customdata: lb.map(d => d.k),
-  }], {...BASE_LAYOUT, hovermode: 'closest', bargap: 0.45,
-       margin: {...BASE_LAYOUT.margin, l: 150, r: 60},
-       xaxis: {...BASE_LAYOUT.xaxis, tickformat: '.0%', range: [0, Math.max(...lb.map(d => d.pct)) * 1.18]},
-       yaxis: {...BASE_LAYOUT.yaxis, showgrid: false}}, PLOT_CFG);
-}
-
-function samplesPanel(j) {
-  const items = j.samples.map(s => `
-    <details><summary><span class="q">${s.query}</span></summary>
-      <div class="respmeta">${s.id} · ${j.model}${s.searches ? ` · ${s.searches} live web searches` : ''}
-        · ${j.agg}: <b style="color:${s.flag ? col('--good') : col('--serious')}">${s.flag}</b></div>
-      <div class="resp">${esc(s.text)}</div>
-    </details>`).join('');
-  return `<div class="panel">
-    <h3>Raw responses — what the judge scored</h3>
-    <div class="sub">Straight from responses.jsonl, unedited.</div>${items}</div>`;
-}
-
 /* ---------------- memory: what Margin remembers ----------------
    No panel of its own: memory shows up as the remembered tag on the job it
    certified, and as the sharpened interval on a warm-started re-run. */
@@ -534,9 +395,8 @@ const tfmt = ts => new Date(ts * 1000).toLocaleTimeString([], {hour: 'numeric', 
 
 /* Every remembered baseline is a job that ran, so the Jobs table is the one
    place a result is reported; memory annotates those rows instead of repeating
-   them. MEM: job_id -> EverOS record. */
-const MEM = {};
-((DATA.memory || {}).baselines || []).forEach(b => MEM[b.job_id] = b);
+   them. MEM: job_id -> remembered measurement. */
+const MEM = {};   // filled by refreshMemory() from GET /memory
 
 const memBadge = id => {
   const b = MEM[id];
@@ -548,7 +408,6 @@ const memBadge = id => {
 /* live-job memory records from GET /memory (http only) -- a job launched from
    this console visibly lands in memory and its row picks up the badge */
 async function refreshMemory() {
-  if (location.protocol === 'file:') return;   // static artifact stays baked
   let recs;
   try { recs = await (await fetch('/memory')).json(); } catch { return; }
   if (!Array.isArray(recs) || !recs.length) return;
@@ -559,7 +418,7 @@ async function refreshMemory() {
 /* ---------------- live job launcher (http only — POST /jobs on this server) */
 const usdSmart = x => usd(x, x < 0.05 ? 4 : 2);
 const ljSlug = s => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
-// the judge's field is the metric's own name, as in every curated job.json --
+// the judge's field is the metric's own name --
 // so the drill-down labels the tile with what was actually measured
 const ljJudgeSystem = (def, field = 'flag') =>
   `You evaluate an AI assistant's response. Return STRICT JSON, nothing else:\n` +
@@ -567,16 +426,14 @@ const ljJudgeSystem = (def, field = 'flag') =>
   `${field} = false otherwise. Judge only the RESPONSE TEXT provided.`;
 const $ = id => document.getElementById(id);
 
-let LIVE_PRESETS = {};   // job_id -> preset shaped like a DATA.jobs entry
+let LIVE_PRESETS = {};   // metric name -> re-measurable preset, built from GET /jobs
 
 async function renderLaunch() {
-  if (location.protocol === 'file:') return;   // static demo artifact: no panel
-  // plain file servers 404 or answer /jobs with a directory listing — require the API's JSON array
   let list;
   try { list = await (await fetch('/jobs')).json(); } catch { return; }
   if (!Array.isArray(list)) return;
-  // remembered live jobs re-run like curated metrics: their metric config and
-  // population came back with server rehydration, their baseline is in memory
+  // a completed run is re-runnable: its metric config and population come back
+  // on the job record, and its baseline is in memory
   // keyed by metric name: a re-run overwrites, so each metric appears once (newest wins)
   list.filter(s => s.status === 'done' && (s.requested.prompts || []).length)
       .forEach(s => { LIVE_PRESETS[s.requested.metric.name] = {
@@ -588,10 +445,12 @@ async function renderLaunch() {
         description: `remembered from live job ${s.id} — a same-model re-run warm-starts
           from the memory baseline (discounted prior, credible interval, drift guard)`,
       }; });
-  const presets = DATA.jobs.map((j, i) =>
-    `<option value="${i}">${j.metric}</option>`).join('')
-    + Object.keys(LIVE_PRESETS).map(name =>
-      `<option value="live:${name}">${name} — from memory</option>`).join('');
+  // the metric library IS the run history: a completed measurement becomes a
+  // preset, so re-measurement is available exactly when there is something to
+  // re-measure. Nothing is seeded -- an empty console offers only "new".
+  const names = Object.keys(LIVE_PRESETS);
+  const presets = names.map(name =>
+    `<option value="live:${name}">${name} — from memory</option>`).join('');
   const checks = (DATA.checks || []).map(c =>
     `<option value="${c.name}">${c.label} — built-in, free</option>`).join('');
   $('launch').innerHTML = `
@@ -599,12 +458,14 @@ async function renderLaunch() {
   <div class="panel">
     <h3>State what you want to know</h3>
     <div class="sub" style="margin-bottom:10px">
-      <label style="margin-right:16px"><input type="radio" name="lj-mode" value="re" checked
-        onchange="ljMode()"> re-measure an existing metric</label>
-      <label><input type="radio" name="lj-mode" value="new" onchange="ljMode()"> new measurement</label>
+      <label style="margin-right:16px"><input type="radio" name="lj-mode" value="re"
+        ${names.length ? 'checked' : 'disabled'} onchange="ljMode()">
+        re-measure an existing metric${names.length ? '' : ' — none yet'}</label>
+      <label><input type="radio" name="lj-mode" value="new"
+        ${names.length ? '' : 'checked'} onchange="ljMode()"> new measurement</label>
     </div>
 
-    <div id="lj-re">
+    <div id="lj-re" ${names.length ? '' : 'style="display:none"'}>
       <div class="sub">The metric brings its own population and judge; choose what varies —
         the model under measurement, the sample size, the precision. This is the
         re-certification / pilot path.</div>
@@ -617,7 +478,7 @@ async function renderLaunch() {
       <div class="sub" id="lj-desc" style="margin:8px 0 0"></div>
     </div>
 
-    <div id="lj-new" style="display:none">
+    <div id="lj-new" ${names.length ? 'style="display:none"' : ''}>
       <div class="sub">Metric and job born together: your prompts, your definition of true.
         Anything mechanically checkable should use a built-in check — free, exact, no judge noise.</div>
       <div class="formrow" style="margin-top:0">
@@ -635,7 +496,7 @@ async function renderLaunch() {
         <label>prompts — upload a .txt (one per line), drop it on the box, or type</label>
         <input type="file" id="lj-file" accept=".txt,text/plain" onchange="ljFile(event)">
         <textarea id="lj-prompts" rows="4" class="mono" style="margin-top:6px" oninput="ljQuote()"
-          placeholder="What's the best face sunscreen?&#10;What sunscreen won't leave a white cast?"></textarea></div>
+          placeholder="Summarize this policy in one sentence.&#10;Reply with only JSON: {&quot;ok&quot;: true}"></textarea></div>
       <details id="lj-judgewrap" style="margin-top:10px"><summary>generated judge instructions</summary>
         <div class="resp mono" id="lj-judge"></div></details>
     </div>
@@ -661,7 +522,7 @@ async function renderLaunch() {
     const f = e.dataTransfer.files[0];
     if (f) f.text().then(t => { ta.value = t.trim(); ljQuote(); });
   });
-  ljPreset();
+  if (names.length) ljPreset(); else ljScorer();
   renderLiveRows();
 }
 
@@ -676,11 +537,8 @@ function ljMode() {
 /* selected built-in check, or undefined when the LLM judge is chosen */
 const ljCheck = () => (DATA.checks || []).find(c => c.name === $('lj-scorer').value);
 
-/* selected re-measure preset: a curated job or a remembered live one */
-const ljSel = () => {
-  const v = $('lj-metric').value;
-  return v.startsWith('live:') ? LIVE_PRESETS[v.slice(5)] : DATA.jobs[+v];
-};
+/* selected re-measure preset -- always a remembered live run */
+const ljSel = () => LIVE_PRESETS[$('lj-metric').value.slice(5)];
 
 function ljScorer() {
   const c = ljCheck();
@@ -816,7 +674,7 @@ async function renderLiveRows() {
   if (!Array.isArray(list)) return;
   LIVE = list;
   renderJobs();
-  if (boot && list.length) {   // open on the newest run, not the curated hero
+  if (boot && list.length) {   // open on the newest run, once
     boot = false;
     const newest = list.reduce((a, b) => (+String(b.id).split('_')[1] || 0)
                                        > (+String(a.id).split('_')[1] || 0) ? b : a);
@@ -830,8 +688,8 @@ let boot = true;   // first /jobs answer picks the default selection; later ones
 
 let ljPolling = null;   // only the newest requested job keeps its poll loop alive
 
-/* an API job status, shaped like a DATA.jobs entry so the drill-down renders it
-   unchanged. No samples: the API returns statistics, not response text. */
+/* an API job status reshaped for the drill-down renderers (tiles/defPanel/
+   convergencePanel). No samples: the API returns statistics, not response text. */
 function liveJob(s) {
   const m = s.requested.metric;
   const live = s.status !== 'done' && s.status !== 'error';
@@ -842,7 +700,7 @@ function liveJob(s) {
     metric: m.name, agg: m.aggregate_field, scorer: m.scorer,
     description: `live job launched from this console — ${s.population} prompts, `
       + `stopping rule armed at ${pts(s.requested.precision.ci_width)}`
-      + (mp ? ` — warm-started from the EverOS baseline (${pct(mp.baseline_rate)} at `
+      + (mp ? ` — warm-started from the remembered baseline (${pct(mp.baseline_rate)} at `
             + `n=${mp.baseline_n}, discounted prior n_eff=${mp.n_eff})`
             + (mp.drift ? ` — DRIFT GUARD ${mp.drift}` : ', credible interval') : ''),
     model: s.requested.measured.model, search: s.requested.measured.web_search,
@@ -882,11 +740,20 @@ async function pollJob(id) {
   else { document.getElementById('lj-go').disabled = false; renderLiveRows(); refreshMemory(); }
 }
 
-document.getElementById('fn-batch').textContent = DATA.batch;
-renderJobs();
-select(0);        // offline artifact stays here; the live server overrides it below
-refreshMemory();
-renderLaunch();   // -> renderLiveRows() -> opens on the newest live run
+/* One bootstrap fetch for the server-side constants (built-in checks, batch
+   size, measured $/query rates), then render. Everything else on this page
+   comes from /jobs and /memory. */
+async function init() {
+  try {
+    const c = await (await fetch('/console')).json();
+    if (c && typeof c === 'object') Object.assign(DATA, c);
+  } catch { /* keep the defaults: the launcher just quotes without a rate */ }
+  document.getElementById('fn-batch').textContent = DATA.batch;
+  renderJobs();
+  refreshMemory();
+  renderLaunch();   // -> renderLiveRows() -> opens on the newest live run
+}
+init();
 </script>
 </body>
 </html>

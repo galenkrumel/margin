@@ -25,8 +25,9 @@
   ],
 
   "assets": {
-    // put the built console here (console.html / margin-console.html, output
-    // of build_console.py) before deploying -- served at GET / via env.ASSETS
+    // public/ is committed source, uploaded as-is: index.html is the console
+    // (served at GET /) and plotly-basic.min.js the one library it loads.
+    // No build step -- what is in the repo is what is deployed.
     "directory": "./public",
     "binding": "ASSETS"
   },
