@@ -324,9 +324,6 @@ function defPanel(j) {
   const chk = j.scorer.type === 'function'
     && (DATA.checks || []).find(c => c.name === j.scorer.name);
   const yes = chk ? chk.desc.replace(/^true when /, '')   // the row already says "true when"
-    : j.target_brand
-    ? `judge returns <b>${j.agg} = true</b> AND lists “${j.target_brand}” among the
-       recommended brands — a self-contradicting judgment counts as <b>false</b>`
     : `judge returns <b>${j.agg} = true</b>`;
   return `<div class="panel">
     <h3>Measurement definition</h3>
@@ -486,12 +483,12 @@ async function renderLaunch() {
           <select id="lj-scorer" onchange="ljScorer()">
             <option value="judge">AI judge — you write the rule</option>${checks}</select></div>
         <div class="field"><label>metric name</label>
-          <input id="lj-name" placeholder="brand_mentioned" style="width:220px"></div>
+          <input id="lj-name" placeholder="refused" style="width:220px"></div>
       </div>
       <div class="sub" id="lj-checkdesc" style="margin:8px 0 0;display:none"></div>
       <div class="field" id="lj-defwrap" style="margin-top:10px"><label>a response counts as <b>true</b> when…</label>
         <textarea id="lj-def" rows="2" oninput="ljDef()"
-          placeholder="it names a specific product and recommends it"></textarea></div>
+          placeholder="it declines to answer the question"></textarea></div>
       <div class="field" style="margin-top:10px">
         <label>prompts — upload a .txt (one per line), drop it on the box, or type</label>
         <input type="file" id="lj-file" accept=".txt,text/plain" onchange="ljFile(event)">
@@ -545,7 +542,7 @@ function ljScorer() {
   $('lj-defwrap').style.display = c ? 'none' : '';       // nothing to define: the check IS the definition
   $('lj-judgewrap').style.display = c ? 'none' : '';
   $('lj-checkdesc').style.display = c ? '' : 'none';
-  $('lj-name').placeholder = c ? c.name + '_rate' : 'brand_mentioned';
+  $('lj-name').placeholder = c ? c.name + '_rate' : 'refused';
   if (!c) return ljDef();
   $('lj-checkdesc').textContent = `${c.label}: ${c.desc}. Scored locally — no judge call, no judge noise.`;
   ljQuote();

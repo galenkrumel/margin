@@ -20,7 +20,7 @@ npx wrangler dev                      # Workflows + D1 under miniflare; needs .d
 
 ## What this is
 
-One Cloudflare Worker that measures a rate (refusal rate, JSON-compliance rate, brand-mention
+One Cloudflare Worker that measures a rate (refusal rate, JSON-compliance rate, sycophancy
 rate) to a *stated precision* rather than a fixed sample size: it runs batches until the
 confidence interval is narrow enough, then stops. `src/api.ts` is the entrypoint for both the
 HTTP routes and the Workflow class.
