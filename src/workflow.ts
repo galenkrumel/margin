@@ -104,7 +104,13 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
         }
 
         const batchSize = Math.min(requested.batch, cap - attempted);
-        state.stage = `generating ${attempted + batchSize}/${cap}`;   // api.py:262
+        // Two counters, because they diverge and only one is the measurement:
+        // prompts *attempted* (a failed call still writes a row and still
+        // advances this) vs executions_used, rows that actually scored. A run
+        // whose calls are all failing used to show a chip sprinting to 120/120
+        // with nothing behind it -- live_1786400361 read "generating 120/120"
+        // at n=20. api.py:262
+        state.stage = `generating ${attempted + batchSize}/${cap} — ${state.executions_used} measured`;
         await updateJobResult(db, jobId, state);
 
         attempted = await step.do(`generate batch ${batchNum}`, async () => {
@@ -138,7 +144,7 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
           return have.size + todo.length;
         });
 
-        state.stage = `scoring ${attempted}/${cap}`;   // api.py:265
+        state.stage = `scoring ${attempted}/${cap} — ${state.executions_used} measured`;   // api.py:265
         await updateJobResult(db, jobId, state);
 
         await step.do(`score batch ${batchNum}`, async () => {
@@ -207,11 +213,12 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
         state.trajectory = [...state.trajectory, { n, p: d.estimate, lo: d.lo, hi: d.hi }];   // api.py:289
         state.failures = failed ? { generate: genFailed, judge: judgeFailed } : null;
 
-        // A terminal API error isn't a flaky call -- every remaining prompt
-        // would fail identically, so grinding through the rest of `cap` just
-        // buys a longer wait for the same answer. Stop on the first one and say
-        // what it was. Written rows stay put, so /resume finishes the job once
-        // the key is fixed rather than paying for the whole run again.
+        // A terminal error isn't a flaky call -- every remaining prompt would
+        // fail identically, so grinding through the rest of `cap` just buys a
+        // longer wait for the same answer. Stop on the first one and say what
+        // it was. Written rows stay put, so /resume finishes the job once the
+        // cause is cleared rather than paying for the whole run again. A spent
+        // subrequest budget clears by itself: the resume is a new instance.
         const terminal = respRows.find(r => isTerminal(r.error))?.error
           ?? scoreRows.find(s => isTerminal(s.score_error))?.score_error;
         if (terminal) {
@@ -219,7 +226,7 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
           state.stop_reason = null;
           state.stage = null;
           state.error = `not retryable -- ${terminal.slice(0, 250)}\n`
-            + `partial result kept at n=${n}; fix the key, then POST /jobs/${jobId}/resume to finish the remaining prompts`;
+            + `partial result kept at n=${n}; clear the cause, then POST /jobs/${jobId}/resume to finish the remaining prompts`;
           await updateJobResult(db, jobId, state);
           break;
         }

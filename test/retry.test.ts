@@ -40,9 +40,50 @@ describe("isTerminal", () => {
   it("anchors the status match so a body quoting '401' is not terminal", () => {
     expect(isTerminal("500: gateway said 401 to someone else")).toBe(false);
   });
+
+  it("catches a spent Cloudflare subrequest budget", () => {
+    // Not OpenAI's error -- the platform's. The call is never sent, so every
+    // remaining one in this invocation dies identically. live_1786400361 spent
+    // ~3 minutes of backoff on 100 of these. The transient-fetch case above
+    // still has to stay false: only THIS fetch failure is terminal.
+    expect(isTerminal("fetch: Error: Too many subrequests by single Worker invocation.")).toBe(true);
+  });
 });
 
+/** A fetch that throws rather than answering -- the subrequest cap never
+ * produces a Response at all, which is why it needs its own stub. */
+function throwingStub(message: string) {
+  const calls: number[] = [];
+  const fn = (async () => {
+    calls.push(1);
+    throw new Error(message);
+  }) as unknown as typeof fetch;
+  return { fn, get n() { return calls.length; } };
+}
+
 describe("generate", () => {
+  it("stops on a thrown subrequest-cap error instead of backing off five times", async () => {
+    // The throw path used to retry unconditionally: five attempts with
+    // exponential sleeps, against a budget that cannot refill mid-invocation.
+    const s = throwingStub("Too many subrequests by single Worker invocation.");
+    const r = await generate("q", CFG, "sk-x", s.fn);
+    expect(s.n).toBe(1);
+    expect(r.error).toContain("Too many subrequests");
+  });
+
+  it("still retries a genuinely transient thrown fetch error", async () => {
+    // The guard against over-reaching: the fix must not turn every throw
+    // terminal, only the subrequest one.
+    vi.useFakeTimers();
+    const s = throwingStub("network error");
+    const p = generate("q", CFG, "sk-x", s.fn);
+    await vi.runAllTimersAsync();
+    const r = await p;
+    vi.useRealTimers();
+    expect(s.n).toBe(5);
+    expect(r.error).toContain("network error");
+  });
+
   it("stops on the first terminal 429 instead of burning all five attempts", async () => {
     const s = stub(429, QUOTA);
     const r = await generate("q", CFG, "sk-x", s.fn);
@@ -79,5 +120,15 @@ describe("judge", () => {
     const r = await judge("text", { system: "s", fields: {} }, "gpt-4o-mini", null, () => ({}), "sk-x", s.fn);
     expect(s.n).toBe(1);
     expect(r.scoreError).toContain("insufficient_quota");
+  });
+
+  it("stops on a thrown subrequest-cap error instead of backing off four times", async () => {
+    // judge() has its own throw branch with its own truncation, so generate()'s
+    // test does not cover it -- and the judge path is not hypothetical:
+    // live_1786400361 failed 10 judge calls this exact way.
+    const s = throwingStub("Too many subrequests by single Worker invocation.");
+    const r = await judge("text", { system: "s", fields: {} }, "gpt-4o-mini", null, () => ({}), "sk-x", s.fn);
+    expect(s.n).toBe(1);
+    expect(r.scoreError).toContain("Too many subrequests");
   });
 });
