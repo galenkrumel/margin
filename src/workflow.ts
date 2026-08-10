@@ -15,7 +15,7 @@ import {
 } from './db';
 import { priorFromBaseline, decide, canAfford, seededShuffle, DRIFT_Z } from './stats';
 import { REGISTRY, coerce } from './scorers';
-import { generate, judge } from './openai';
+import { generate, judge, isTerminal } from './openai';
 
 const MAX_CONCURRENT = 15;   // fan-out cap for both generate() and judge() calls
 const round4 = (x: number) => Math.round(x * 10000) / 10000;
@@ -44,7 +44,7 @@ function normalizePrompts(prompts: JobState['requested']['prompts']) {
 
 export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
   async run(event: WorkflowEvent<MeasureParams>, step: WorkflowStep) {
-    const { jobId, tenant, requested, openaiKey } = event.payload;
+    const { jobId, tenant, requested, openaiKey, trajectory } = event.payload;
     const db = this.env.DB;
     const metric = requested.metric;
     const aggField = metric.aggregate_field;
@@ -54,6 +54,9 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
     const cap = Math.min(requested.budget.max_executions, queries.length);   // api.py:254
 
     const state: JobState = initialJobState(jobId, requested);
+    // On a resume, keep the convergence curve the earlier batches already paid
+    // for -- this run appends to it. Empty on a first run, so no branch needed.
+    state.trajectory = trajectory ?? [];
     state.status = 'running';
 
     try {
@@ -204,6 +207,23 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
         state.trajectory = [...state.trajectory, { n, p: d.estimate, lo: d.lo, hi: d.hi }];   // api.py:289
         state.failures = failed ? { generate: genFailed, judge: judgeFailed } : null;
 
+        // A terminal API error isn't a flaky call -- every remaining prompt
+        // would fail identically, so grinding through the rest of `cap` just
+        // buys a longer wait for the same answer. Stop on the first one and say
+        // what it was. Written rows stay put, so /resume finishes the job once
+        // the key is fixed rather than paying for the whole run again.
+        const terminal = respRows.find(r => isTerminal(r.error))?.error
+          ?? scoreRows.find(s => isTerminal(s.score_error))?.score_error;
+        if (terminal) {
+          state.status = 'error';
+          state.stop_reason = null;
+          state.stage = null;
+          state.error = `not retryable -- ${terminal.slice(0, 250)}\n`
+            + `partial result kept at n=${n}; fix the key, then POST /jobs/${jobId}/resume to finish the remaining prompts`;
+          await updateJobResult(db, jobId, state);
+          break;
+        }
+
         if (d.stop === 'population_exhausted' && failed > attempted * 0.1) {
           // ponytail: >10% failed calls makes "population exhausted" a lie -- error
           // out with the partial numbers kept; `remember` skips non-done jobs, so a
@@ -211,7 +231,10 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
           state.status = 'error';
           state.stop_reason = null;
           state.stage = null;
-          state.error = `${genFailed}/${attempted} generate and ${judgeFailed}/${scoreRows.length} judge calls failed after retries -- partial result at n=${n}`;
+          const why = respRows.find(r => !r.ok)?.error ?? scoreRows.find(s => s.score === null)?.score_error;
+          state.error = `${genFailed}/${attempted} generate and ${judgeFailed}/${scoreRows.length} judge calls failed after retries -- partial result at n=${n}\n`
+            + `first failure: ${(why ?? 'unknown').slice(0, 250)}\n`
+            + `POST /jobs/${jobId}/resume to retry just the failed prompts`;
           await updateJobResult(db, jobId, state);
           break;
         }

@@ -34,6 +34,18 @@ export function cost(model: string, tokensIn: number, tokensOut: number, searche
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+/** Failures no retry can fix: a revoked key, a quota only a human can top up,
+ * a model the account can't see. Matched on the message rather than the status
+ * because OpenAI overloads 429 -- rate-limit (retry) and insufficient_quota
+ * (retrying only burns the clock) share it, and only the body's `error.code`
+ * separates them. Both retry loops below and workflow.ts call this, so the
+ * classification lives in one place; it reads the *persisted* error string,
+ * which is what lets the workflow's check survive a step replay. */
+export function isTerminal(msg: string | null | undefined): boolean {
+  return !!msg && (/^(401|403|404):/.test(msg)
+    || /insufficient_quota|invalid_api_key|account_deactivated|model_not_found/.test(msg));
+}
+
 function extractText(data: any): [text: string, searches: number] {
   const text: string[] = [];
   let searches = 0;
@@ -85,6 +97,10 @@ export async function generate(
   if (cfg.reasoningEffort) payload.reasoning = { effort: cfg.reasoningEffort };
 
   let result: GenerateResult | null = null;
+  // Carried across attempts so a give-up reports the last real reason. Losing
+  // it was why 100 failed calls in live_1786374587 all read "retries
+  // exhausted" -- a dead key and a busy minute were indistinguishable.
+  let lastError = "retries exhausted";
   for (let attempt = 0; attempt < GEN_MAX_RETRIES; attempt++) {
     let r: Response;
     try {
@@ -93,7 +109,8 @@ export async function generate(
         headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-    } catch {
+    } catch (e) {
+      lastError = `fetch: ${String(e).slice(0, 200)}`;
       await sleep(Math.min(2 ** attempt + Math.random(), 30) * 1000);
       continue;
     }
@@ -116,6 +133,8 @@ export async function generate(
       break;
     }
     if ([429, 500, 502, 503].includes(r.status)) {
+      lastError = `${r.status}: ${(await r.text()).slice(0, 200)}`;
+      if (isTerminal(lastError)) break;   // 429 insufficient_quota -- four more tries change nothing
       await sleep(Math.min(2 ** attempt + Math.random(), 30) * 1000);
       continue;
     }
@@ -130,7 +149,7 @@ export async function generate(
     };
     break;
   }
-  return result ?? { status: "error", response: "", inputTokens: 0, outputTokens: 0, searchCalls: 0, cost: 0, error: "retries exhausted" };
+  return result ?? { status: "error", response: "", inputTokens: 0, outputTokens: 0, searchCalls: 0, cost: 0, error: lastError };
 }
 
 export interface JudgeResult {
@@ -161,6 +180,7 @@ export async function judge(
     ],
   };
 
+  let lastError = "retries exhausted";   // see generate() above
   for (let attempt = 0; attempt < JUDGE_MAX_RETRIES; attempt++) {
     let r: Response;
     try {
@@ -169,7 +189,8 @@ export async function judge(
         headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-    } catch {
+    } catch (e) {
+      lastError = `fetch: ${String(e).slice(0, 150)}`;
       await sleep(2 ** attempt * 1000);
       continue;
     }
@@ -188,10 +209,12 @@ export async function judge(
       }
     }
     if ([429, 500, 502, 503].includes(r.status)) {
+      lastError = `${r.status}: ${(await r.text()).slice(0, 150)}`;
+      if (isTerminal(lastError)) break;
       await sleep(2 ** attempt * 1000);
       continue;
     }
     return { score: null, judgeCost: 0, scoreError: `${r.status}: ${(await r.text()).slice(0, 150)}` };
   }
-  return { score: null, judgeCost: 0, scoreError: "retries exhausted" };
+  return { score: null, judgeCost: 0, scoreError: lastError };
 }
