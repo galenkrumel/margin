@@ -235,7 +235,7 @@ const cell0 = (metric, desc, sub) =>
 function liveItem(s) {
   const metric = esc(s.requested.metric.name || 'live job');
   const desc = `live job · ${s.id}`;
-  return {metric, desc, sup: false,
+  return {metric, desc, sup: false, id: s.id,
     ts: 1e6 + (+String(s.id).split('_')[1] || 0),   // live_<epoch>: newest live run wins
     attrs: `class="row liverow jrow" id="liverow-${s.id}" onclick="pollJob('${s.id}')"`,
     cells: [
@@ -288,7 +288,11 @@ function renderJobs() {
       ? [cell0(g.metric, `${n} runs — newest first`), '', '', '', '', '']
       : [cell0(g.metric, `${n} runs — newest first`, `latest: ${L.desc}`), ...L.cells.slice(1)];
     return `<tbody class="jobgroup stack${open ? ' open' : ''}">
-      ${jobRow(`class="ghead" onclick="toggleGroup('${g.metric.replace(/'/g, "\\'")}')"`, head)}
+      ${jobRow(open
+        ? `class="ghead" onclick="toggleGroup('${g.metric.replace(/'/g, "\\'")}')"`
+        // closed, the header IS the newest run -- so click it like a run: drill
+        // in (which also opens the group, so the blue bar lands on its row)
+        : `class="ghead" onclick="pollJob('${L.id}')"`, head)}
       ${g.rows.map(r => jobRow(r.attrs, r.cells)).join('')}
     </tbody>`;
   }).join(''));
@@ -742,7 +746,6 @@ async function resumeJob(id) {
 }
 
 async function pollJob(id) {
-  const first = ljPolling !== id;   // mid-poll: don't yank the page on every tick
   ljPolling = id;
   let s;
   try { s = await (await fetch('/jobs/' + id)).json(); }
@@ -765,7 +768,6 @@ async function pollJob(id) {
           <button id="lj-resume" onclick="resumeJob('${esc(id)}')">Resume — retry only the failed prompts</button>
         </div></div>` : '');
   if (j.trajectory.length) drawConvergence(j);
-  if (first) document.getElementById('drill').scrollIntoView({behavior: 'smooth', block: 'start'});
   if (live) setTimeout(() => pollJob(id), 2500);
   else { document.getElementById('lj-go').disabled = false; renderLiveRows(); refreshMemory(); }
 }
