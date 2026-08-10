@@ -43,6 +43,44 @@ empty means everything here is already in `main`. It is not sufficient on its ow
 branch still shows commits `main` "lacks" while being just as spent. The `gh`
 check above is the one that decides.
 
+## Wait for greptile after every push to a PR
+
+Greptile reviews each pushed commit. Don't hand the PR back and stop — start a
+background watcher keyed to the SHA just pushed, so its exit re-invokes you and
+the findings get addressed in the same session instead of being relayed by hand:
+
+Read the SHA and PR number with two plain commands first (`git rev-parse HEAD`,
+`gh pr view --json number -q .number`), then paste both in as literals:
+
+```bash
+sha=<sha>; for i in $(seq 1 40); do
+  if gh api repos/<owner>/<repo>/pulls/<pr>/reviews --jq ".[] | select(.user.login==\"greptile-apps\" and .commit_id==\"$sha\") | .id" | grep -q .; then echo "greptile reviewed $sha"; exit 0; fi
+  sleep 30
+done; echo "timeout: no greptile review of $sha after 20m"
+```
+
+Run it with `run_in_background: true` — a foreground `sleep` is blocked, and the
+point is to keep working while it waits. Matching on `commit_id` is what makes
+it correct: the review of the *previous* commit is already sitting on the PR, so
+a watcher that only checks the author fires instantly on stale feedback.
+
+The shape of that command is load-bearing in a worktree session, where the
+sandbox refuses anything it can't verify stays inside the worktree. An inline
+`$(git rev-parse HEAD)`, a `{owner}/{repo}` placeholder, or a `&& { …; exit 0; }`
+group all get rejected; the `if … then … fi` form above runs. Push a second
+watcher only after stopping the previous SHA's — two live watchers means one
+wakes you on a review you have already handled.
+
+Then read the line-level findings (the PR body comment is only a summary):
+
+```bash
+gh api "repos/{owner}/{repo}/pulls/$pr/comments" --jq '.[] | {path, line, body}'
+```
+
+Each finding is a claim, not a verdict — confirm it against the code before
+fixing, and say so in the PR when one is wrong rather than editing to appease it.
+A fix push starts the cycle again; watch that SHA too.
+
 ## What this is
 
 One Cloudflare Worker that measures a rate (refusal rate, JSON-compliance rate, sycophancy
