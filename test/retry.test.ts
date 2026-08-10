@@ -121,4 +121,14 @@ describe("judge", () => {
     expect(s.n).toBe(1);
     expect(r.scoreError).toContain("insufficient_quota");
   });
+
+  it("stops on a thrown subrequest-cap error instead of backing off four times", async () => {
+    // judge() has its own throw branch with its own truncation, so generate()'s
+    // test does not cover it -- and the judge path is not hypothetical:
+    // live_1786400361 failed 10 judge calls this exact way.
+    const s = throwingStub("Too many subrequests by single Worker invocation.");
+    const r = await judge("text", { system: "s", fields: {} }, "gpt-4o-mini", null, () => ({}), "sk-x", s.fn);
+    expect(s.n).toBe(1);
+    expect(r.scoreError).toContain("Too many subrequests");
+  });
 });
