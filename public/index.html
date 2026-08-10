@@ -107,6 +107,10 @@
            border-radius: 10px; padding: 22px 24px; margin-top: 16px; }
   .panel h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
   .panel .sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+  /* the pre-flight price. The one line on this panel worth reading before you
+     spend, so it is not muted like the rest of the supporting copy. */
+  .quote { color: var(--ink-2); font-size: 13.5px; }
+  .quote b { color: var(--ink); }
 
   .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
            gap: 12px; margin-top: 16px; }
@@ -157,10 +161,8 @@
     <div class="wordmark">margin</div>
     <div class="tagline">state what you want to know — we find N</div>
   </header>
-  <div class="subhead">Precision-targeted measurement for stochastic systems.
-    Submit a prompt population, a metric, and a precision target with a budget cap;
-    the engine runs the minimum executions, scores every response, and reports the
-    estimate, the achieved confidence interval, and the bill.</div>
+  <div class="subhead">You state the precision. Margin runs the minimum executions to reach
+    it, then stops.</div>
 
   <div id="launch"></div>
 
@@ -240,8 +242,9 @@ function liveItem(s) {
       cell0(metric, desc, `measured: ${esc(s.requested.measured.model)}${s.requested.measured.web_search ? ' + web search' : ''}${memBadge(s.id)}`),
       s.estimate != null
         ? `<div class="est">${pct(s.estimate)}</div><div class="cellsub">${s.k} of ${s.executions_used} true</div>` : '—',
-      s.ci ? `${pct(s.ci[0])} – ${pct(s.ci[1])} <span style="color:var(--muted)">(${pts(s.ci_width)}
-               · target ${pts(s.requested.precision.ci_width)})</span>` : '—',
+      // the target lives in the tooltip -- what was achieved is what the row is for
+      s.ci ? `<span title="target ${pts(s.requested.precision.ci_width)}">${pct(s.ci[0])} – ${pct(s.ci[1])}
+               <span style="color:var(--muted)">${pts(s.ci_width)}</span></span>` : '—',
       `<div class="est">${s.executions_used || 0}</div>
        <div class="cellsub">of ${s.population} submitted</div>`,
       usdSmart(s.cost_usd || 0), ljChip(s)]};
@@ -277,9 +280,14 @@ function renderJobs() {
     const L = g.rows[0], n = g.rows.length;   // the newest run IS the group headline
     if (n === 1)                              // one run: no chrome, click drills straight in
       return `<tbody class="jobgroup">${jobRow(L.attrs, L.cells)}</tbody>`;
-    const head = [cell0(g.metric, `${n} runs — newest first`, `latest: ${L.desc}`),
-                  ...L.cells.slice(1)];
-    return `<tbody class="jobgroup stack${jgOpen.has(g.metric) ? ' open' : ''}">
+    // Closed, the header stands in for the newest run and carries its numbers.
+    // Open, every run is listed below -- so repeating them here printed the
+    // newest run twice, identically.
+    const open = jgOpen.has(g.metric);
+    const head = open
+      ? [cell0(g.metric, `${n} runs — newest first`), '', '', '', '', '']
+      : [cell0(g.metric, `${n} runs — newest first`, `latest: ${L.desc}`), ...L.cells.slice(1)];
+    return `<tbody class="jobgroup stack${open ? ' open' : ''}">
       ${jobRow(`class="ghead" onclick="toggleGroup('${g.metric.replace(/'/g, "\\'")}')"`, head)}
       ${g.rows.map(r => jobRow(r.attrs, r.cells)).join('')}
     </tbody>`;
@@ -442,8 +450,7 @@ async function renderLaunch() {
         pop: s.requested.prompts.length,
         model: s.requested.measured.model, search: s.requested.measured.web_search,
         estimate: s.estimate,
-        description: `remembered from live job ${s.id} — a same-model re-run warm-starts
-          from the memory baseline (discounted prior, credible interval, drift guard)`,
+        n: s.executions_used, job_id: s.id,   // n is what makes the remembered rate trustworthy
       }; });
   // the metric library IS the run history: a completed measurement becomes a
   // preset, so re-measurement is available exactly when there is something to
@@ -456,31 +463,31 @@ async function renderLaunch() {
   $('launch').innerHTML = `
   <h2>Run a live job</h2>
   <div class="panel">
-    <h3>State what you want to know</h3>
     <div class="sub" style="margin-bottom:10px">
       <label style="margin-right:16px"><input type="radio" name="lj-mode" value="re"
         ${names.length ? 'checked' : 'disabled'} onchange="ljMode()">
-        re-measure an existing metric${names.length ? '' : ' — none yet'}</label>
+        re-measure an existing metric${names.length ? ' — reuses its prompts and judge' : ' — none yet'}</label>
       <label><input type="radio" name="lj-mode" value="new"
-        ${names.length ? '' : 'checked'} onchange="ljMode()"> new measurement</label>
+        ${names.length ? '' : 'checked'} onchange="ljMode()"> new measurement — bring your own prompts</label>
     </div>
 
     <div id="lj-re" ${names.length ? '' : 'style="display:none"'}>
-      <div class="sub">The metric brings its own population and judge; choose what varies —
-        the model under measurement, the sample size, the precision. This is the
-        re-certification / pilot path.</div>
       <div class="formrow" style="margin-top:0">
         <div class="field"><label>metric</label>
           <select id="lj-metric" onchange="ljPreset()">${presets}</select></div>
-        <div class="field"><label>sample N <span id="lj-popn" style="color:var(--muted)"></span></label>
+        <!-- caps the population this run may draw from -- NOT the execution count.
+             Precision decides how many of these actually get run. -->
+        <div class="field"><label>draw from <span id="lj-popn" style="color:var(--muted)"></span></label>
           <input type="number" id="lj-n" min="1" style="width:90px" oninput="ljQuote()"></div>
       </div>
       <div class="sub" id="lj-desc" style="margin:8px 0 0"></div>
     </div>
 
     <div id="lj-new" ${names.length ? 'style="display:none"' : ''}>
-      <div class="sub">Metric and job born together: your prompts, your definition of true.
-        Anything mechanically checkable should use a built-in check — free, exact, no judge noise.</div>
+      <!-- the radio label already says "bring your own prompts"; the only thing
+           left worth saying is which scorer to reach for -->
+      <div class="sub">Anything mechanically checkable should use a built-in check — free,
+        exact, no judge noise.</div>
       <div class="formrow" style="margin-top:0">
         <div class="field"><label>scored by</label>
           <select id="lj-scorer" onchange="ljScorer()">
@@ -512,7 +519,7 @@ async function renderLaunch() {
         <input type="number" id="lj-usd" value="1.00" step="0.25" min="0.05" style="width:90px" oninput="ljQuote()"></div>
       <button id="lj-go" onclick="launchJob()">Run job</button>
     </div>
-    <div class="sub" id="lj-quote" style="margin:10px 0 0"></div>
+    <div class="quote" id="lj-quote" style="margin:12px 0 0"></div>
     <div id="lj-status" style="margin-top:14px"></div>
   </div>`;
   const ta = $('lj-prompts');
@@ -553,10 +560,14 @@ function ljScorer() {
 
 function ljPreset() {
   const j = ljSel();
-  $('lj-popn').textContent = `of ${j.pop}`;
+  $('lj-popn').textContent = `(${j.pop} available)`;
   $('lj-n').value = j.pop; $('lj-n').max = j.pop;
   $('lj-model').value = j.model; $('lj-search').checked = j.search;
-  $('lj-desc').textContent = `${j.description} — remembered rate ${pct(j.estimate)} on ${j.model}${j.search ? ' + web search' : ''}.`;
+  // a fact, not a sentence: the remembered number and what it buys. The mechanism
+  // (discounted prior, credible interval, drift guard) is the detail panel's job.
+  $('lj-desc').textContent = `last measured ${pct(j.estimate)} (n=${j.n}) on ${j.model}${j.search ? ' + web search' : ''}`
+    + ` — this run starts from that, so it needs fewer executions.`;
+  $('lj-desc').title = `remembered from job ${j.job_id}`;
   ljQuote();
 }
 
@@ -590,14 +601,14 @@ function ljQuote() {
   const chk = !reMode && ljCheck();     // a built-in check pays generation only
   const rate = (chk ? DATA.rates_gen : DATA.rates)[
     $('lj-model').value + '|' + ($('lj-search').checked ? 1 : 0)];
-  const parts = [`±${(50 * w).toFixed(0)}pts at ${pLabel} needs ~${need} executions`];
+  const parts = [`<b>±${(50 * w).toFixed(0)}pts needs ~${need} executions</b> at ${pLabel}`];
   if (P < need) parts.push(`only ${P} available — will run all and report the achieved interval`);
   if (rate) {
-    parts.push(`quote ≤ ${usdSmart(runN * rate)} at measured rates, less if it converges early`
+    parts.push(`<b>≤ ${usdSmart(runN * rate)}</b>, less if it converges early`
                + (chk ? ' — scoring is free, so this is generation only' : ''));
     if (runN * rate > budget) parts.push(`<b>budget ${usd(budget)} stops at ~${Math.floor(budget / rate)}</b>`);
   } else parts.push('no measured rate for this model+search combo yet — no quote');
-  q.innerHTML = 'Quote: ' + parts.join(' · ');
+  q.innerHTML = parts.join(' · ');
 }
 
 function ljFile(e) {
