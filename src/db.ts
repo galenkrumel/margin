@@ -27,6 +27,13 @@ export interface MeasureParams {
   tenant: string;
   requested: RequestedJob;
   openaiKey: string;
+  /** Set only by a resume: the convergence points the job already paid for, so
+   * the run appends to that curve instead of restarting it. Carried in params
+   * rather than re-read from the job row because params are frozen for the
+   * instance's life -- a replay after a mid-run deploy sees the same value,
+   * where a fresh read would see the row this very run has been updating and
+   * double-count its own points. */
+  trajectory?: TrajectoryPoint[];
 }
 
 // ---- the STATE blob: api.py's in-memory STATE[job_id], now the `result` column --
@@ -157,6 +164,23 @@ export async function updateJobResult(db: D1Database, id: string, state: JobStat
   ).bind(state.status, JSON.stringify(state), Date.now(), id).run();
 }
 
+/** Take ownership of an errored job for a resume, atomically. The guard and the
+ * status flip are one statement, so of two overlapping resume requests exactly
+ * one sees changes=1 -- without that both would pass a separate status check,
+ * both clear the failed rows, and both start a workflow on the same jobId,
+ * paying twice for every missing prompt. Callers must do the clear and the
+ * createInstance only after this returns true. */
+export async function claimResume(db: D1Database, id: string, state: JobState): Promise<boolean> {
+  // RETURNING, not meta.changes: local D1 (miniflare, i.e. `wrangler dev`)
+  // hands back a meta with only `duration` on an UPDATE, so a changes-based
+  // guard reads 0 and refuses every resume. A returned row is the same answer
+  // in both environments because it's SQL, not runtime metadata.
+  const { results } = await db.prepare(
+    `UPDATE jobs SET status = ?, result = ?, updated_at = ? WHERE id = ? AND status = 'error' RETURNING id`
+  ).bind(state.status, JSON.stringify(state), Date.now(), id).all<{ id: string }>();
+  return results.length > 0;
+}
+
 // ---- responses ------------------------------------------------------------
 
 export async function insertResponses(db: D1Database, jobId: string, rows: ResponseRow[]): Promise<void> {
@@ -175,11 +199,11 @@ export async function insertResponses(db: D1Database, jobId: string, rows: Respo
  * retry resumable), so without this a resume finds every qid written and does
  * nothing. Returns the row count, which is the "retrying N prompts" answer. */
 export async function clearFailures(db: D1Database, jobId: string): Promise<number> {
-  const [resp, sc] = await db.batch([
-    db.prepare(`DELETE FROM responses WHERE job_id = ? AND ok = 0`).bind(jobId),
-    db.prepare(`DELETE FROM scores WHERE job_id = ? AND score IS NULL`).bind(jobId),
+  const [resp, sc] = await db.batch<{ qid: string }>([   // RETURNING for the same reason as claimResume
+    db.prepare(`DELETE FROM responses WHERE job_id = ? AND ok = 0 RETURNING qid`).bind(jobId),
+    db.prepare(`DELETE FROM scores WHERE job_id = ? AND score IS NULL RETURNING qid`).bind(jobId),
   ]);
-  return (resp.meta?.changes ?? 0) + (sc.meta?.changes ?? 0);
+  return resp.results.length + sc.results.length;
 }
 
 export async function listResponses(db: D1Database, jobId: string): Promise<ResponseRow[]> {

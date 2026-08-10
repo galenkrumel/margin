@@ -44,7 +44,7 @@ function normalizePrompts(prompts: JobState['requested']['prompts']) {
 
 export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
   async run(event: WorkflowEvent<MeasureParams>, step: WorkflowStep) {
-    const { jobId, tenant, requested, openaiKey } = event.payload;
+    const { jobId, tenant, requested, openaiKey, trajectory } = event.payload;
     const db = this.env.DB;
     const metric = requested.metric;
     const aggField = metric.aggregate_field;
@@ -54,6 +54,9 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
     const cap = Math.min(requested.budget.max_executions, queries.length);   // api.py:254
 
     const state: JobState = initialJobState(jobId, requested);
+    // On a resume, keep the convergence curve the earlier batches already paid
+    // for -- this run appends to it. Empty on a first run, so no branch needed.
+    state.trajectory = trajectory ?? [];
     state.status = 'running';
 
     try {

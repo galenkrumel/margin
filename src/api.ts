@@ -20,7 +20,7 @@
 import {
   type Env, type RequestedJob, type MetricConfig,
   initialJobState, createJob, getJob, listJobs, listMeasurements,
-  clearFailures, updateJobResult,
+  clearFailures, updateJobResult, claimResume,
 } from './db';
 import { CHECKS } from './scorers';
 import { consolePayload } from './console';
@@ -150,19 +150,39 @@ async function resumeJobRoute(request: Request, env: Env, tenant: string, id: st
   const openaiKey: string | undefined = body?.openai_key || env.OPENAI_API_KEY;
   if (!openaiKey) return json({ detail: 'openai_key required (BYOK)' }, 422);
 
-  const retrying = await clearFailures(env.DB, id);
-  state.status = 'queued';
-  state.stage = 'resuming';
-  state.error = null;
-  state.failures = null;
-  await updateJobResult(env.DB, id, state);
+  // Rebuilt rather than patched: leaving the failed attempt's executions_used,
+  // estimate, cost and stop_reason on a job now reported as `queued` is an
+  // incoherent read for anyone polling in the window before the workflow
+  // persists. The one thing worth keeping is the convergence curve.
+  const resumed = initialJobState(id, state.requested);
+  resumed.stage = 'resuming';
+  resumed.trajectory = state.trajectory;
 
-  // a fresh instance id -- the old one is spent, while the job id (and every
-  // row already written under it) stays exactly where it is
-  await env.MEASURE.create({
-    id: `${id}-r${crypto.randomUUID().slice(0, 8)}`,
-    params: { jobId: id, tenant, requested: state.requested, openaiKey },
-  });
+  // Claim BEFORE clearing anything -- the status guard is what makes two
+  // overlapping resumes resolve to one winner, and the loser must not have
+  // deleted rows on its way out.
+  if (!await claimResume(env.DB, id, resumed)) {
+    return json({ detail: 'job is already being resumed' }, 409);
+  }
+
+  const retrying = await clearFailures(env.DB, id);
+  try {
+    // a fresh instance id -- the old one is spent, while the job id (and every
+    // row already written under it) stays exactly where it is
+    await env.MEASURE.create({
+      id: `${id}-r${crypto.randomUUID().slice(0, 8)}`,
+      params: { jobId: id, tenant, requested: state.requested, openaiKey, trajectory: state.trajectory },
+    });
+  } catch (e) {
+    // Nothing will ever move this job out of `queued` if the instance never
+    // started, and the guard above only accepts `error` -- so put it back
+    // rather than wedging it out of reach of every future resume.
+    state.status = 'error';
+    state.stage = null;
+    state.error = `resume failed to start: ${String(e).slice(0, 200)}`;
+    await updateJobResult(env.DB, id, state);
+    return json({ detail: 'could not start the resume workflow' }, 502);
+  }
   return json({ job_id: id, retrying });
 }
 
