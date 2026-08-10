@@ -40,10 +40,19 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
  * (retrying only burns the clock) share it, and only the body's `error.code`
  * separates them. Both retry loops below and workflow.ts call this, so the
  * classification lives in one place; it reads the *persisted* error string,
- * which is what lets the workflow's check survive a step replay. */
+ * which is what lets the workflow's check survive a step replay.
+ *
+ * "Too many subrequests" is Cloudflare's, not OpenAI's: the per-invocation
+ * fetch budget is spent, so every remaining call in THIS invocation fails the
+ * same way -- and it isn't even sent, so retrying just sleeps. A resume gets a
+ * fresh instance and a fresh budget, which is exactly the recovery path the
+ * terminal branch in workflow.ts already points at. Diagnosed on
+ * live_1786400361: 50 calls landed, the next 100 died here over ~3 minutes of
+ * pointless backoff. */
 export function isTerminal(msg: string | null | undefined): boolean {
   return !!msg && (/^(401|403|404):/.test(msg)
-    || /insufficient_quota|invalid_api_key|account_deactivated|model_not_found/.test(msg));
+    || /insufficient_quota|invalid_api_key|account_deactivated|model_not_found/.test(msg)
+    || /Too many subrequests/.test(msg));
 }
 
 function extractText(data: any): [text: string, searches: number] {
@@ -111,6 +120,7 @@ export async function generate(
       });
     } catch (e) {
       lastError = `fetch: ${String(e).slice(0, 200)}`;
+      if (isTerminal(lastError)) break;   // a spent subrequest budget won't refill mid-invocation
       await sleep(Math.min(2 ** attempt + Math.random(), 30) * 1000);
       continue;
     }
@@ -191,6 +201,7 @@ export async function judge(
       });
     } catch (e) {
       lastError = `fetch: ${String(e).slice(0, 150)}`;
+      if (isTerminal(lastError)) break;   // see generate() above
       await sleep(2 ** attempt * 1000);
       continue;
     }
