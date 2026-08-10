@@ -259,6 +259,15 @@ function toggleGroup(metric) {
   renderJobs();
 }
 
+/* Closed group header: expand here, before the drill-down fetch -- pollJob
+   retries silently on a network failure, and expanding inside it would leave
+   a failed click looking like a dead row. */
+function openRun(metric, id) {
+  jgOpen.add(metric);
+  renderJobs();
+  pollJob(id);
+}
+
 function renderJobs() {
   const items = LIVE.map(liveItem);
   const tblEl = document.getElementById('jobs-table');
@@ -283,16 +292,16 @@ function renderJobs() {
     // Closed, the header stands in for the newest run and carries its numbers.
     // Open, every run is listed below -- so repeating them here printed the
     // newest run twice, identically.
-    const open = jgOpen.has(g.metric);
+    const open = jgOpen.has(g.metric), key = g.metric.replace(/'/g, "\\'");
     const head = open
       ? [cell0(g.metric, `${n} runs — newest first`), '', '', '', '', '']
       : [cell0(g.metric, `${n} runs — newest first`, `latest: ${L.desc}`), ...L.cells.slice(1)];
     return `<tbody class="jobgroup stack${open ? ' open' : ''}">
       ${jobRow(open
-        ? `class="ghead" onclick="toggleGroup('${g.metric.replace(/'/g, "\\'")}')"`
-        // closed, the header IS the newest run -- so click it like a run: drill
-        // in (which also opens the group, so the blue bar lands on its row)
-        : `class="ghead" onclick="pollJob('${L.id}')"`, head)}
+        ? `class="ghead" onclick="toggleGroup('${key}')"`
+        // closed, the header IS the newest run -- so click it like a run: open
+        // the group and drill in, so the blue bar lands on that run's row
+        : `class="ghead" onclick="openRun('${key}', '${L.id}')"`, head)}
       ${g.rows.map(r => jobRow(r.attrs, r.cells)).join('')}
     </tbody>`;
   }).join(''));
