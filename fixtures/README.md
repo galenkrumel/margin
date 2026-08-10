@@ -10,9 +10,13 @@ repo writes here, and re-generating any of it would invalidate the tests.
 
 `test/golden.test.ts` replays five of these runs batch-by-batch through
 `decide()` and asserts it reproduces the recorded trajectory, stop point, and
-stop reason — plus the three curated Wilson numbers off `mirror.jsonl`. That
-replay is what proves the measurement engine is correct; these files are the
-evidence it checks against.
+stop reason — plus one curated Wilson number off `mirror.jsonl`. That replay is
+what proves the measurement engine is correct; these files are the evidence it
+checks against.
+
+Some earlier recorded runs were dropped from `jobs/` and `mirror.jsonl`. Nothing
+replayed them; the Wilson values two of them pinned are kept as literals in
+`test/stats.test.ts`, so no coverage went with them.
 
 Two of the recorded intervals are **deliberately not** reproduced: the runs that
 warm-start from a zero-rate baseline recorded a normal-approximation credible
