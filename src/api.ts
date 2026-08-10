@@ -11,6 +11,7 @@
 //     s.requested.measured.web_search s.requested.precision.ci_width
 //     s.requested.prompts
 //   POST /jobs   -> (await r.json()).job_id
+//   POST /jobs/:id/resume -> job_id, retrying   (added, not part of api.py)
 //   GET  /memory -> b.job_id b.ts b.interval b.prior_n_eff
 //   GET  /console -> batch, checks, rates, rates_gen  (see src/console.ts)
 //
@@ -19,6 +20,7 @@
 import {
   type Env, type RequestedJob, type MetricConfig,
   initialJobState, createJob, getJob, listJobs, listMeasurements,
+  clearFailures, updateJobResult,
 } from './db';
 import { CHECKS } from './scorers';
 import { consolePayload } from './console';
@@ -124,6 +126,46 @@ async function createJobRoute(request: Request, env: Env, tenant: string): Promi
   return json({ job_id: jobId });   // api.py:323-324
 }
 
+/** Finish a job that errored, paying only for the prompts that failed.
+ *
+ * The recovery already existed and had no door: the workflow's steps skip any
+ * qid already in `responses`/`scores` (that's what makes a step retry
+ * resumable), so a fresh Workflow instance pointed at the same job id picks up
+ * exactly where the last one stopped. clearFailures() is what makes the failed
+ * rows eligible again -- without it every qid is present and the resume is a
+ * no-op.
+ *
+ * BYOK hygiene is unchanged: the key comes from THIS request's body (or the
+ * house key), never from anything persisted -- there is nothing stored to
+ * resume from, by design. */
+async function resumeJobRoute(request: Request, env: Env, tenant: string, id: string): Promise<Response> {
+  const state = await getJob(env.DB, tenant, id);
+  if (!state) return json({ detail: 'no such job' }, 404);
+  if (state.status !== 'error') {
+    return json({ detail: `job is ${state.status} -- only errored jobs can be resumed` }, 409);
+  }
+
+  let body: any = {};
+  try { body = await request.json(); } catch { /* empty body is fine -- house key */ }
+  const openaiKey: string | undefined = body?.openai_key || env.OPENAI_API_KEY;
+  if (!openaiKey) return json({ detail: 'openai_key required (BYOK)' }, 422);
+
+  const retrying = await clearFailures(env.DB, id);
+  state.status = 'queued';
+  state.stage = 'resuming';
+  state.error = null;
+  state.failures = null;
+  await updateJobResult(env.DB, id, state);
+
+  // a fresh instance id -- the old one is spent, while the job id (and every
+  // row already written under it) stays exactly where it is
+  await env.MEASURE.create({
+    id: `${id}-r${crypto.randomUUID().slice(0, 8)}`,
+    params: { jobId: id, tenant, requested: state.requested, openaiKey },
+  });
+  return json({ job_id: id, retrying });
+}
+
 async function listJobsRoute(env: Env, tenant: string): Promise<Response> {
   return json(await listJobs(env.DB, tenant));   // api.py:327-329
 }
@@ -159,6 +201,10 @@ export default {
       }
 
       if (request.method === 'POST' && url.pathname === '/jobs') return createJobRoute(request, env, tenant);
+      if (request.method === 'POST' && url.pathname.startsWith('/jobs/') && url.pathname.endsWith('/resume')) {
+        const id = decodeURIComponent(url.pathname.slice('/jobs/'.length, -'/resume'.length));
+        return resumeJobRoute(request, env, tenant, id);
+      }
       if (request.method === 'GET' && url.pathname === '/jobs') return listJobsRoute(env, tenant);
       if (request.method === 'GET' && url.pathname.startsWith('/jobs/')) {
         return getJobRoute(env, tenant, decodeURIComponent(url.pathname.slice('/jobs/'.length)));

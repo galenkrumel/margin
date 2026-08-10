@@ -714,6 +714,22 @@ function liveJob(s) {
   };
 }
 
+/* The rows an errored job already paid for are still in D1; POST /jobs/:id/resume
+   re-runs just the ones that failed, under the same job id. */
+async function resumeJob(id) {
+  const b = document.getElementById('lj-resume');
+  if (b) { b.disabled = true; b.textContent = 'resuming…'; }
+  try {
+    const r = await fetch('/jobs/' + id + '/resume', {method: 'POST'});
+    if (!r.ok) throw new Error(await r.text());
+    ljPolling = null;   // force pollJob to treat this as a fresh open
+    pollJob(id);
+  } catch (e) {
+    if (b) { b.disabled = false; b.textContent = 'Resume — retry only the failed prompts'; }
+    alert('resume failed: ' + e);
+  }
+}
+
 async function pollJob(id) {
   const first = ljPolling !== id;   // mid-poll: don't yank the page on every tick
   ljPolling = id;
@@ -733,7 +749,10 @@ async function pollJob(id) {
     + defPanel(j)
     + (j.trajectory.length ? convergencePanel(j) : '')
     + (s.error ? `<div class="panel"><h3>Job error</h3>
-        <div class="resp mono" style="color:var(--warning)">${esc(s.error)}</div></div>` : '');
+        <div class="resp mono" style="color:var(--warning)">${esc(s.error)}</div>
+        <div style="padding:0 16px 14px 30px">
+          <button id="lj-resume" onclick="resumeJob('${esc(id)}')">Resume — retry only the failed prompts</button>
+        </div></div>` : '');
   if (j.trajectory.length) drawConvergence(j);
   if (first) document.getElementById('drill').scrollIntoView({behavior: 'smooth', block: 'start'});
   if (live) setTimeout(() => pollJob(id), 2500);

@@ -169,6 +169,19 @@ export async function insertResponses(db: D1Database, jobId: string, rows: Respo
     stmt.bind(jobId, r.qid, r.ok ? 1 : 0, r.text, r.tokens_in, r.tokens_out, r.searches, r.cost, r.error)));
 }
 
+/** Drop what a failed attempt left behind, so a resumed job re-runs exactly the
+ * prompts that failed and pays for nothing else. Required, not cosmetic: the
+ * generate/score steps skip any qid already present (that's what makes a step
+ * retry resumable), so without this a resume finds every qid written and does
+ * nothing. Returns the row count, which is the "retrying N prompts" answer. */
+export async function clearFailures(db: D1Database, jobId: string): Promise<number> {
+  const [resp, sc] = await db.batch([
+    db.prepare(`DELETE FROM responses WHERE job_id = ? AND ok = 0`).bind(jobId),
+    db.prepare(`DELETE FROM scores WHERE job_id = ? AND score IS NULL`).bind(jobId),
+  ]);
+  return (resp.meta?.changes ?? 0) + (sc.meta?.changes ?? 0);
+}
+
 export async function listResponses(db: D1Database, jobId: string): Promise<ResponseRow[]> {
   const { results } = await db.prepare(
     `SELECT qid, ok, text, tokens_in, tokens_out, searches, cost, error FROM responses WHERE job_id = ?`
