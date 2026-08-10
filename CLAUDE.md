@@ -18,6 +18,31 @@ npx wrangler dev                      # Workflows + D1 under miniflare; needs .d
 `.dev.vars` supplies `MARGIN_TOKENS` locally. Deploy happens on push to `main`
 (`.github/workflows/deploy.yml`); `npx wrangler deploy` by hand does the same thing.
 
+## Never commit to a spent branch
+
+A merged PR's branch is finished. Commits pushed to it afterwards land nowhere —
+not in `main`, not deployed, and the merged PR will not pick them up. The work
+looks shipped (the push succeeds, the commit exists) and isn't.
+
+The trap is timing: the branch is usually live when the work *starts* and spent
+by the time it is *committed*, because the merge happened mid-session. So this is
+checked at commit time, never at start time:
+
+```bash
+gh pr list --head "$(git branch --show-current)" --state all --json number,state
+```
+
+- an `OPEN` entry — commit here; that PR carries the work
+- only `MERGED` / `CLOSED` entries — spent. Cut a new branch and commit there:
+  `git checkout -b <name> origin/main`
+- no entries — an unproposed branch, fine to commit
+
+After `git fetch`, `git log --oneline origin/main..HEAD` is a quick second look:
+empty means everything here is already in `main`. It is not sufficient on its own
+— a **squash-merged** PR puts its commits into `main` under a new hash, so the
+branch still shows commits `main` "lacks" while being just as spent. The `gh`
+check above is the one that decides.
+
 ## What this is
 
 One Cloudflare Worker that measures a rate (refusal rate, JSON-compliance rate, brand-mention
