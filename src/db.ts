@@ -101,7 +101,7 @@ export interface JobState {   // api.py:316-322 (create) + :286-301 (per-batch u
   failures: { generate: number; judge: number } | null;   // visible error accounting, cloud-only addition
 }
 
-/** api.py:316-322 -- the record a brand-new job starts life as. Shared by
+/** api.py:316-322 -- the record a freshly created job starts life as. Shared by
  * api.ts (writes it synchronously so POST /jobs can return right away) and
  * workflow.ts (keeps its own mutable copy as the run progresses). */
 export function initialJobState(id: string, requested: RequestedJob): JobState {

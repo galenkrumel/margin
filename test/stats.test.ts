@@ -15,12 +15,27 @@ describe("stats selfcheck (stats.py:30-45)", () => {
     expect(Math.abs(hi - 0.031)).toBeLessThan(0.002);
   });
 
-  it("own-brand job: 38/39", () => {
+  it("38/39 -> point estimate near the ceiling, interval still strictly inside it", () => {
     const [p, lo, hi] = wilson(38, 39);
     expect(Math.abs(p - 0.974)).toBeLessThan(0.001);
     expect(hi).toBeLessThanOrEqual(1.0);
     expect(lo).toBeLessThan(p);
     expect(p).toBeLessThan(hi);
+  });
+
+  // Parity values recorded by the Python engine for two runs whose fixtures are
+  // gone. Kept as literals: the numbers are the evidence, the runs were only
+  // ever where they came from.
+  it("38/39 and 131/254 reproduce the recorded 4-decimal intervals", () => {
+    const [p1, lo1, hi1] = wilson(38, 39);
+    expect(p1).toBeCloseTo(0.9744, 4);
+    expect(lo1).toBeCloseTo(0.8682, 4);
+    expect(hi1).toBeCloseTo(0.9955, 4);
+
+    const [p2, lo2, hi2] = wilson(131, 254);
+    expect(p2).toBeCloseTo(0.5157, 4);
+    expect(lo2).toBeCloseTo(0.4545, 4);
+    expect(hi2).toBeCloseTo(0.5765, 4);
   });
 
   it("symmetry: k and n-k mirror around 0.5", () => {

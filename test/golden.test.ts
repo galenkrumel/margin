@@ -30,25 +30,10 @@ function readJson(path: string): any {
 // -- curated jobs (build_console.py's conservative_flags AND-with-leaderboard
 // logic is skipped here -- see report; asserting the plain Wilson numbers off
 // the mirror instead, which is what stats.py's own selfcheck already proves
-// the formula produces) -------------------------------------------------
-describe("curated jobs -- headline Wilson numbers vs mirror.jsonl lines 1-3", () => {
+// the formula produces). The other two curated records were dropped with their
+// fixtures; their recorded Wilson values live on as literals in stats.test.ts.
+describe("curated jobs -- headline Wilson numbers vs mirror.jsonl", () => {
   const mirror = readJsonl(MIRROR);
-
-  it("aeo_category_share: 131/254", () => {
-    const rec = mirror.find((r) => r.job_id === "aeo_category_share");
-    const [p, lo, hi] = wilson(131, 254);
-    expect(p).toBeCloseTo(rec.rate, 4);
-    expect(lo).toBeCloseTo(rec.ci_lo, 4);
-    expect(hi).toBeCloseTo(rec.ci_hi, 4);
-  });
-
-  it("aeo_own_brand: 38/39", () => {
-    const rec = mirror.find((r) => r.job_id === "aeo_own_brand");
-    const [p, lo, hi] = wilson(38, 39);
-    expect(p).toBeCloseTo(rec.rate, 4);
-    expect(lo).toBeCloseTo(rec.ci_lo, 4);
-    expect(hi).toBeCloseTo(rec.ci_hi, 4);
-  });
 
   it("refusal_medical: 0/120", () => {
     const rec = mirror.find((r) => r.job_id === "refusal_medical");
