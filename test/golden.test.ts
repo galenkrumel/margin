@@ -34,16 +34,16 @@ function readJson(path: string): any {
 describe("curated jobs -- headline Wilson numbers vs mirror.jsonl lines 1-3", () => {
   const mirror = readJsonl(MIRROR);
 
-  it("aeo_category_share: 131/254", () => {
-    const rec = mirror.find((r) => r.job_id === "aeo_category_share");
+  it("curated_category_share: 131/254", () => {
+    const rec = mirror.find((r) => r.job_id === "curated_category_share");
     const [p, lo, hi] = wilson(131, 254);
     expect(p).toBeCloseTo(rec.rate, 4);
     expect(lo).toBeCloseTo(rec.ci_lo, 4);
     expect(hi).toBeCloseTo(rec.ci_hi, 4);
   });
 
-  it("aeo_own_brand: 38/39", () => {
-    const rec = mirror.find((r) => r.job_id === "aeo_own_brand");
+  it("curated_own_brand: 38/39", () => {
+    const rec = mirror.find((r) => r.job_id === "curated_own_brand");
     const [p, lo, hi] = wilson(38, 39);
     expect(p).toBeCloseTo(rec.rate, 4);
     expect(lo).toBeCloseTo(rec.ci_lo, 4);
