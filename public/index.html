@@ -300,8 +300,9 @@ function renderJobs() {
       ${jobRow(open
         ? `class="ghead" onclick="toggleGroup('${key}')"`
         // closed, the header IS the newest run -- so click it like a run: open
-        // the group and drill in, so the blue bar lands on that run's row
-        : `class="ghead" onclick="openRun('${key}', '${L.id}')"`, head)}
+        // the group and drill in, so the blue bar lands on that run's row.
+        // It also stands in for a selected run hidden inside it, bar and all.
+        : `class="ghead${g.rows.some(r => 'liverow-' + r.id === selId) ? ' sel' : ''}" onclick="openRun('${key}', '${L.id}')"`, head)}
       ${g.rows.map(r => jobRow(r.attrs, r.cells)).join('')}
     </tbody>`;
   }).join(''));
