@@ -100,6 +100,13 @@
            border: 0; border-radius: 8px; padding: 9px 18px; cursor: pointer; }
   button:disabled { background: var(--deemph); cursor: default; }
   .formrow { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; margin-top: 12px; }
+  /* the launcher is a header the whole page sits under, so it stays dense:
+     one wrapping row of fields, collapsible when it is in the way */
+  #lj-panel { padding: 0 20px 16px; }
+  #lj-panel > summary { padding: 12px 0 0; }
+  #lj-panel > summary h2 { display: inline; margin: 0; }
+  #lj-panel input, #lj-panel select { padding: 6px 9px; }
+  #lj-panel .field label { margin-bottom: 2px; }
 
   /* ---- drill-down ---- */
   #drill { margin-top: 8px; }
@@ -166,7 +173,7 @@
 
   <div id="launch"></div>
 
-  <h2>Jobs</h2>
+  <h2>Job History</h2>
   <table class="jobs" id="jobs-table">
     <thead><tr>
       <th>Metric</th>
@@ -471,26 +478,14 @@ async function renderLaunch() {
   const checks = (DATA.checks || []).map(c =>
     `<option value="${c.name}">${c.label} — built-in, free</option>`).join('');
   $('launch').innerHTML = `
-  <h2>Run a live job</h2>
-  <div class="panel">
-    <div class="sub" style="margin-bottom:10px">
+  <details class="panel" id="lj-panel" open>
+    <summary><h2>New Job</h2></summary>
+    <div class="sub" style="margin:8px 0 6px">
       <label style="margin-right:16px"><input type="radio" name="lj-mode" value="re"
         ${names.length ? 'checked' : 'disabled'} onchange="ljMode()">
         re-measure an existing metric${names.length ? ' — reuses its prompts and judge' : ' — none yet'}</label>
       <label><input type="radio" name="lj-mode" value="new"
         ${names.length ? '' : 'checked'} onchange="ljMode()"> new measurement — bring your own prompts</label>
-    </div>
-
-    <div id="lj-re" ${names.length ? '' : 'style="display:none"'}>
-      <div class="formrow" style="margin-top:0">
-        <div class="field"><label>metric</label>
-          <select id="lj-metric" onchange="ljPreset()">${presets}</select></div>
-        <!-- caps the population this run may draw from -- NOT the execution count.
-             Precision decides how many of these actually get run. -->
-        <div class="field"><label>draw from <span id="lj-popn" style="color:var(--muted)"></span></label>
-          <input type="number" id="lj-n" min="1" style="width:90px" oninput="ljQuote()"></div>
-      </div>
-      <div class="sub" id="lj-desc" style="margin:8px 0 0"></div>
     </div>
 
     <div id="lj-new" ${names.length ? 'style="display:none"' : ''}>
@@ -519,19 +514,30 @@ async function renderLaunch() {
     </div>
 
     <div class="formrow">
+      <!-- re-measure's two fields ride the same row as the shared settings, so the
+           whole launcher is one line in that mode -->
+      <div id="lj-re" class="formrow" style="margin-top:0${names.length ? '' : ';display:none'}">
+        <div class="field"><label>metric</label>
+          <select id="lj-metric" onchange="ljPreset()">${presets}</select></div>
+        <!-- caps the population this run may draw from -- NOT the execution count.
+             Precision decides how many of these actually get run. -->
+        <div class="field"><label>draw from <span id="lj-popn" style="color:var(--muted)"></span></label>
+          <input type="number" id="lj-n" min="1" style="width:90px" oninput="ljQuote()"></div>
+      </div>
       <div class="field"><label>measured model</label>
         <select id="lj-model" onchange="ljQuote()"><option>gpt-4o-mini</option><option>gpt-5</option></select></div>
       <div class="field"><label>web search</label>
-        <input type="checkbox" id="lj-search" style="height:37px" onchange="ljQuote()"></div>
+        <input type="checkbox" id="lj-search" style="height:31px" onchange="ljQuote()"></div>
       <div class="field"><label>precision ±pts</label>
         <input type="number" id="lj-prec" value="7" min="1" max="25" style="width:80px" oninput="ljQuote()"></div>
       <div class="field"><label>budget $</label>
         <input type="number" id="lj-usd" value="1.00" step="0.25" min="0.05" style="width:90px" oninput="ljQuote()"></div>
       <button id="lj-go" onclick="launchJob()">Run job</button>
     </div>
-    <div class="quote" id="lj-quote" style="margin:12px 0 0"></div>
-    <div id="lj-status" style="margin-top:14px"></div>
-  </div>`;
+    <div class="sub" id="lj-desc" style="margin:10px 0 0"></div>
+    <div class="quote" id="lj-quote" style="margin:6px 0 0"></div>
+    <div id="lj-status" style="margin-top:12px"></div>
+  </details>`;
   const ta = $('lj-prompts');
   ta.addEventListener('dragover', e => e.preventDefault());
   ta.addEventListener('drop', e => {
@@ -547,7 +553,9 @@ function ljMode() {
   const re = document.querySelector('input[name=lj-mode]:checked').value === 're';
   $('lj-re').style.display = re ? '' : 'none';
   $('lj-new').style.display = re ? 'none' : '';
-  if (!re) { $('lj-model').value = 'gpt-4o-mini'; $('lj-search').checked = false; ljScorer(); }
+  // lj-desc lives outside lj-re now, so the remembered-rate line has to be cleared by hand
+  if (!re) { $('lj-model').value = 'gpt-4o-mini'; $('lj-search').checked = false;
+             $('lj-desc').textContent = ''; ljScorer(); }
   else ljPreset();
 }
 
