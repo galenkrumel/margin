@@ -54,8 +54,8 @@ Read the SHA and PR number with two plain commands first (`git rev-parse HEAD`,
 
 ```bash
 sha=<sha>; for i in $(seq 1 40); do
-  if gh api repos/<owner>/<repo>/pulls/<pr>/reviews --jq ".[] | select((.user.login|startswith(\"greptile-apps\")) and .commit_id==\"$sha\") | .id" | grep -q .; then echo "greptile reviewed $sha"; exit 0; fi
-  if gh api repos/<owner>/<repo>/issues/<pr>/comments --jq '.[] | select(.user.login|startswith("greptile-apps")) | .body' | grep -q "$sha"; then echo "greptile commented on $sha"; exit 0; fi
+  if gh api --paginate repos/<owner>/<repo>/pulls/<pr>/reviews --jq ".[] | select((.user.login|startswith(\"greptile-apps\")) and .commit_id==\"$sha\") | .id" | grep -q .; then echo "greptile reviewed $sha"; exit 0; fi
+  if gh api --paginate repos/<owner>/<repo>/issues/<pr>/comments --jq '.[] | select(.user.login|startswith("greptile-apps")) | .body' | grep -q "$sha"; then echo "greptile commented on $sha"; exit 0; fi
   sleep 30
 done; echo "timeout: no greptile review of $sha after 20m"
 ```
@@ -74,6 +74,9 @@ point is to keep working while it waits. Three details are load-bearing:
 - **Keyed to the SHA either way.** The feedback on the *previous* commit is already
   sitting on the PR, so a watcher that only checks the author fires instantly on
   stale findings.
+- **`--paginate`.** Both endpoints page at 30. The newest item is on the *last*
+  page, so on a PR that has accumulated a few rounds of review the one item the
+  watcher is waiting for is exactly the one a single-page fetch drops.
 
 Transient `tls: failed to verify certificate` errors from `gh` are normal here
 (they hit `gh pr create` too — just re-run it). The loop is right to ignore them
@@ -90,7 +93,7 @@ wakes you on a review you have already handled.
 Then read the line-level findings (the PR body comment is only a summary):
 
 ```bash
-gh api "repos/{owner}/{repo}/pulls/$pr/comments" --jq '.[] | {path, line, body}'
+gh api --paginate "repos/{owner}/{repo}/pulls/$pr/comments" --jq '.[] | {path, line, body}'
 ```
 
 Each finding is a claim, not a verdict — confirm it against the code before
