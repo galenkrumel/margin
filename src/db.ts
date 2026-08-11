@@ -15,8 +15,6 @@ export interface Env {
   MEASURE: Workflow<MeasureParams>;
   ASSETS: Fetcher;
   MARGIN_TOKENS: string;      // "tenant:secret,tenant2:secret2" -- HTTP Basic, see authTenant() in api.ts
-  EVEROS_BASE_URL: string;
-  EVEROS_API_KEY?: string;    // unset -> memory writes stay local-only (memory_store.py:73-75)
   OPENAI_API_KEY?: string;    // optional house-tenant fallback; BYOK (request body openai_key) is the default path
 }
 
@@ -242,8 +240,8 @@ export async function listScores(db: D1Database, jobId: string): Promise<ScoreRo
 // ---- measurements / memory ---------------------------------------------------
 
 /** Most recent measurement for (metric, tenant) -- the warm-start baseline
- * (api.py:242-251 MemoryStore().recall_baseline, minus the live EverOS search:
- * api.py's own numbers always come from the mirror too, per memory_store.py:108). */
+ * (api.py:242-251 MemoryStore().recall_baseline, minus its live external search:
+ * api.py's own numbers always came from the mirror too, per memory_store.py:108). */
 export async function latestBaseline(db: D1Database, metric: string, tenant: string): Promise<Baseline | null> {
   const row = await db.prepare(
     `SELECT model_version, n, k, rate FROM measurements

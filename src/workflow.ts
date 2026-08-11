@@ -72,11 +72,9 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
         state.memory_prior = {
           baseline_n: baseline.n, baseline_rate: baseline.rate,
           n_eff: Math.round(prior.a0 + prior.b0 - 2),   // a0+b0-2 == n*scale; stats.ts already applied PRIOR_CAP
-          // ponytail: api.py also fires a live EverOS *search* here purely to
-          // prove the memory layer is real -- the actual prior always comes
-          // from the mirror regardless (memory_store.py:108-118, "authoritative
-          // numbers from mirror"). Skipping that ping changes no math. Add a
-          // step here if the demo specifically wants to show the round-trip.
+          // api.py also fired a live search at an external memory service here,
+          // but its numbers came from the mirror regardless (memory_store.py:
+          // 108-118, "authoritative numbers from mirror"). D1 is the mirror.
           recall_mode: 'd1',
           drift: null,
         };
@@ -256,7 +254,7 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
         await updateJobResult(db, jobId, state);
       }
 
-      // ---- remember: measurement row + best-effort EverOS push -- api.py:199-218 --
+      // ---- remember: the measurement row future runs warm-start from -- api.py:199-218 --
       await step.do('remember', async () => {
         if (state.status !== 'done' || !state.executions_used) return;   // api.py:204
         const rec = {
@@ -276,32 +274,10 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
         }
         await insertMeasurement(db, { ...rec, extra });
 
-        let memory: NonNullable<JobState['memory']>;
-        if (!this.env.EVEROS_API_KEY) {
-          memory = { ok: true, mode: 'local' };   // memory_store.py:73-75 (no key -> local only)
-        } else {
-          try {
-            const payload = {   // memory_store.py:42-46 _add_payload
-              session_id: 'margin-measurements',
-              messages: [{
-                sender_id: 'margin-engine', role: 'user',
-                content: 'MEASUREMENT RESULT ' + JSON.stringify({ ...rec, ...extra }),
-                timestamp: Date.now(),
-              }],
-            };
-            const r = await fetch(`${this.env.EVEROS_BASE_URL}/api/v2/memory/add`, {
-              method: 'POST',
-              headers: { Authorization: `Bearer ${this.env.EVEROS_API_KEY}`, 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload),
-            });
-            memory = { ok: r.status >= 200 && r.status < 300, mode: 'live', status: r.status };
-          } catch (e) {
-            // swallow all errors -- the `measurements` insert above already
-            // has the durable local copy. memory_store.py:84-87
-            memory = { ok: true, mode: 'local', error: String(e).slice(0, 200) };
-          }
-        }
-        state.memory = memory;
+        // D1 is the only memory store. Kept in the state blob because the
+        // response shape is frozen (see api.ts's header) -- api.py:218 always
+        // reported this, and now it is always the local answer.
+        state.memory = { ok: true, mode: 'local' };
         await updateJobResult(db, jobId, state);
       });
     } catch (e) {
