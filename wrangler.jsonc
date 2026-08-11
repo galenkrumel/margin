@@ -30,15 +30,10 @@
     // No build step -- what is in the repo is what is deployed.
     "directory": "./public",
     "binding": "ASSETS"
-  },
-
-  "vars": {
-    "EVEROS_BASE_URL": "https://api.evermind.ai"
   }
 
   // secrets (never in this file -- `wrangler secret put <NAME>`):
   //   MARGIN_TOKENS     "tenant:secret,tenant2:secret2" -- HTTP Basic user:pass -> tenant map
-  //   EVEROS_API_KEY    optional -- unset means memory writes stay D1-local (no EverOS push)
   //   OPENAI_API_KEY    optional -- fallback key for a "house" tenant; normal
   //                     path is BYOK, the client sends openai_key in the POST /jobs body
 }

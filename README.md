@@ -140,6 +140,5 @@ By hand, the same thing:
     npx wrangler deploy
 
 Worker secrets are separate, and set once with `wrangler secret put`: `MARGIN_TOKENS`
-(required), `OPENAI_API_KEY` (optional house-key fallback), `EVEROS_API_KEY` (optional —
-without it, remembered measurements simply stay in D1). A fresh database needs
+(required) and `OPENAI_API_KEY` (optional house-key fallback). A fresh database needs
 `schema.sql` applied once with `wrangler d1 execute margin --remote --file=schema.sql`.
