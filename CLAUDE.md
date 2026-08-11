@@ -54,15 +54,31 @@ Read the SHA and PR number with two plain commands first (`git rev-parse HEAD`,
 
 ```bash
 sha=<sha>; for i in $(seq 1 40); do
-  if gh api repos/<owner>/<repo>/pulls/<pr>/reviews --jq ".[] | select(.user.login==\"greptile-apps\" and .commit_id==\"$sha\") | .id" | grep -q .; then echo "greptile reviewed $sha"; exit 0; fi
+  if gh api repos/<owner>/<repo>/pulls/<pr>/reviews --jq ".[] | select((.user.login|startswith(\"greptile-apps\")) and .commit_id==\"$sha\") | .id" | grep -q .; then echo "greptile reviewed $sha"; exit 0; fi
+  if gh api repos/<owner>/<repo>/issues/<pr>/comments --jq '.[] | select(.user.login|startswith("greptile-apps")) | .body' | grep -q "$sha"; then echo "greptile commented on $sha"; exit 0; fi
   sleep 30
 done; echo "timeout: no greptile review of $sha after 20m"
 ```
 
 Run it with `run_in_background: true` — a foreground `sleep` is blocked, and the
-point is to keep working while it waits. Matching on `commit_id` is what makes
-it correct: the review of the *previous* commit is already sitting on the PR, so
-a watcher that only checks the author fires instantly on stale feedback.
+point is to keep working while it waits. Three details are load-bearing:
+
+- **`startswith`, not `==`.** On the REST API the author is `greptile-apps[bot]`,
+  brackets and all. `gh pr view --json comments` reports the same account as bare
+  `greptile-apps`, so an `==` match against what that prints never fires and the
+  watcher always times out.
+- **Both endpoints.** Some runs post a formal *review*, some only an issue comment
+  on the PR; a `/reviews`-only poll sleeps through the comment-only ones. The
+  comment carries a "Last reviewed commit" link, so grepping its body for the SHA
+  is the same freshness check `commit_id` gives on a review.
+- **Keyed to the SHA either way.** The feedback on the *previous* commit is already
+  sitting on the PR, so a watcher that only checks the author fires instantly on
+  stale findings.
+
+Transient `tls: failed to verify certificate` errors from `gh` are normal here
+(they hit `gh pr create` too — just re-run it). The loop is right to ignore them
+and keep polling, but they mean a timeout is not proof that greptile said nothing:
+check the PR by hand before concluding it was silent.
 
 The shape of that command is load-bearing in a worktree session, where the
 sandbox refuses anything it can't verify stays inside the worktree. An inline
