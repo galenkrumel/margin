@@ -15,10 +15,18 @@ import {
 } from './db';
 import { priorFromBaseline, decide, canAfford, seededShuffle, DRIFT_Z } from './stats';
 import { REGISTRY, coerce } from './scorers';
-import { generate, judge, isTerminal } from './openai';
+import { generate, judge, isTerminal, genFailure } from './openai';
 
 const MAX_CONCURRENT = 15;   // fan-out cap for both generate() and judge() calls
 const round4 = (x: number) => Math.round(x * 10000) / 10000;
+
+/** The only logging in the Worker, and only for failed calls. The job's own
+ * `error` field is written for whoever launched the run; this is for whoever
+ * has to support it -- `wrangler tail` (or `wrangler dev`'s console) is where
+ * you find a failure whose job row has since been re-run or forgotten. */
+function log(jobId: string, msg: string): void {
+  console.error(`[${jobId}] ${msg}`);
+}
 
 /** Run `fn` over `items` with at most `limit` in flight -- runner.py's
  * --concurrency semaphore, worker-pool flavored for a fixed list. */
@@ -126,18 +134,23 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
               }, openaiKey);
               return { qid: q.id, r };
             });
-            await insertResponses(db, jobId, gen.map(({ qid, r }) => {
-              const text = (r.response || '').trim();
-              // scorer.py:199-201: "completed" with text, or "incomplete" long
-              // enough to salvage. Anything else (error, empty) is not ok.
-              const ok = !r.error && !!text
-                && (r.status === 'completed' || (r.status === 'incomplete' && text.length > 200));
+            const rows = gen.map(({ qid, r }) => {
+              const error = genFailure(r);   // never null when the row is not ok
               return {
-                qid, ok, text: r.response,
+                qid, ok: !error, text: r.response,
                 tokens_in: r.inputTokens, tokens_out: r.outputTokens,
-                searches: r.searchCalls, cost: r.cost, error: r.error,
+                searches: r.searchCalls, cost: r.cost, error,
               };
-            }));
+            });
+            // After the write, not before: a step that dies mid-write is
+            // retried, and the retry regenerates whatever it finds unwritten.
+            // Logging first would print the batch twice and leave a supporter
+            // counting failures that were never persisted. Logging after means
+            // one line per batch that actually landed -- and the re-queried
+            // `have` above keeps the retry from re-logging the same qids.
+            await insertResponses(db, jobId, rows);
+            const bad = rows.filter(r => !r.ok);
+            if (bad.length) log(jobId, `generate batch ${batchNum}: ${bad.length}/${rows.length} failed -- ${bad[0].error}`);
           }
           return have.size + todo.length;
         });
@@ -170,7 +183,9 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
               };
             });
           }
-          await insertScores(db, jobId, rows);
+          await insertScores(db, jobId, rows);   // log after the write, as above
+          const bad = rows.filter(r => r.score === null);
+          if (bad.length) log(jobId, `score batch ${batchNum}: ${bad.length}/${rows.length} failed -- ${bad[0].score_error}`);
         });
 
         // ---- Wilson/credible + stop rule -- plain math, NOT a step (api.py:271-301) --
@@ -225,6 +240,7 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
           state.stage = null;
           state.error = `not retryable -- ${terminal.slice(0, 250)}\n`
             + `partial result kept at n=${n}; clear the cause, then POST /jobs/${jobId}/resume to finish the remaining prompts`;
+          log(jobId, `stopped at n=${n}, not retryable -- ${terminal}`);
           await updateJobResult(db, jobId, state);
           break;
         }
@@ -236,10 +252,14 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
           state.status = 'error';
           state.stop_reason = null;
           state.stage = null;
-          const why = respRows.find(r => !r.ok)?.error ?? scoreRows.find(s => s.score === null)?.score_error;
+          // `&& r.error` so one legacy row written before genFailure() existed
+          // (reasonless, hence the "unknown" this line used to print) can't
+          // shadow a later row that does carry its reason.
+          const why = respRows.find(r => !r.ok && r.error)?.error ?? scoreRows.find(s => s.score === null)?.score_error;
           state.error = `${genFailed}/${attempted} generate and ${judgeFailed}/${scoreRows.length} judge calls failed after retries -- partial result at n=${n}\n`
             + `first failure: ${(why ?? 'unknown').slice(0, 250)}\n`
             + `POST /jobs/${jobId}/resume to retry just the failed prompts`;
+          log(jobId, `stopped at n=${n}, ${genFailed} generate + ${judgeFailed} judge failed -- ${why ?? 'unknown'}`);
           await updateJobResult(db, jobId, state);
           break;
         }

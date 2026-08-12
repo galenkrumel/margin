@@ -22,6 +22,22 @@ export function price(model: string): [number, number] {
   throw new Error(`no price for ${model} -- add to PRICES`);
 }
 
+/** Reasoning models bill their thinking against max_output_tokens and emit it
+ * as no visible text, so runner.py's flat 400 -- fine for gpt-4o-mini, which
+ * spends all 400 on the answer -- left gpt-5 nothing to answer *with*: 9 of 60
+ * calls in live_1786494131 returned 0 chars after 384 tokens of reasoning.
+ * o-series is listed for when it is measurable; it also needs a PRICES entry,
+ * since price() throws on a model it cannot cost. */
+const REASONING = /^(gpt-5|o[1-9])/;
+
+/** The cap is not a spend -- only generated tokens bill, and budget.max_usd
+ * still stops the run -- so the reasoning default buys headroom rather than
+ * cost. 4000 covers a few thousand tokens of thinking plus a short answer,
+ * which is the shape every metric here measures. */
+export function defaultMaxOutputTokens(model: string): number {
+  return REASONING.test(model) ? 4000 : 400;
+}
+
 function round6(x: number): number {
   return Math.round(x * 1e6) / 1e6;
 }
@@ -160,6 +176,23 @@ export async function generate(
     break;
   }
   return result ?? { status: "error", response: "", inputTokens: 0, outputTokens: 0, searchCalls: 0, cost: 0, error: lastError };
+}
+
+/** Why a generate result is unusable for measurement -- null when it is fine.
+ *
+ * scorer.py:199-201's policy: "completed" with text, or "incomplete" long
+ * enough to salvage. Everything else is a failed call, and the ones that
+ * arrive as an HTTP *200* carry no `error` of their own -- status and
+ * incomplete_details are the only record of why. Dropping them is what made
+ * live_1786494131 report `first failure: unknown` for 9 gpt-5 calls that spent
+ * all 400 of their max_output_tokens on reasoning and emitted no visible text.
+ * Same lesson as the retry reasons above: the reason has to survive the call. */
+export function genFailure(r: GenerateResult): string | null {
+  if (r.error) return r.error;
+  const text = (r.response || "").trim();
+  if (text && (r.status === "completed" || (r.status === "incomplete" && text.length > 200))) return null;
+  const reason = (r.incompleteDetails as { reason?: string } | null | undefined)?.reason;
+  return `${r.status}${reason ? ` (${reason})` : ""} -- ${text.length} chars from ${r.outputTokens} output tokens`;
 }
 
 export interface JudgeResult {
