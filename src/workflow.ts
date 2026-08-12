@@ -142,9 +142,15 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
                 searches: r.searchCalls, cost: r.cost, error,
               };
             });
+            // After the write, not before: a step that dies mid-write is
+            // retried, and the retry regenerates whatever it finds unwritten.
+            // Logging first would print the batch twice and leave a supporter
+            // counting failures that were never persisted. Logging after means
+            // one line per batch that actually landed -- and the re-queried
+            // `have` above keeps the retry from re-logging the same qids.
+            await insertResponses(db, jobId, rows);
             const bad = rows.filter(r => !r.ok);
             if (bad.length) log(jobId, `generate batch ${batchNum}: ${bad.length}/${rows.length} failed -- ${bad[0].error}`);
-            await insertResponses(db, jobId, rows);
           }
           return have.size + todo.length;
         });
@@ -177,9 +183,9 @@ export class MeasureWorkflow extends WorkflowEntrypoint<Env, MeasureParams> {
               };
             });
           }
+          await insertScores(db, jobId, rows);   // log after the write, as above
           const bad = rows.filter(r => r.score === null);
           if (bad.length) log(jobId, `score batch ${batchNum}: ${bad.length}/${rows.length} failed -- ${bad[0].score_error}`);
-          await insertScores(db, jobId, rows);
         });
 
         // ---- Wilson/credible + stop rule -- plain math, NOT a step (api.py:271-301) --
