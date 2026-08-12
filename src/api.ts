@@ -23,6 +23,7 @@ import {
   clearFailures, updateJobResult, claimResume,
 } from './db';
 import { CHECKS } from './scorers';
+import { defaultMaxOutputTokens } from './openai';
 import { consolePayload } from './console';
 
 // wrangler requires Workflow classes to be exported from the entrypoint file
@@ -88,7 +89,8 @@ function fillDefaults(body: any): RequestedJob {
     measured: {
       model: body.measured?.model ?? 'gpt-4o-mini',
       web_search: body.measured?.web_search ?? false,
-      max_output_tokens: body.measured?.max_output_tokens ?? 400,
+      max_output_tokens: body.measured?.max_output_tokens
+        ?? defaultMaxOutputTokens(body.measured?.model ?? 'gpt-4o-mini'),
       reasoning_effort: body.measured?.reasoning_effort ?? null,
     },
     precision: {

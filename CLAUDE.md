@@ -43,9 +43,10 @@ empty means everything here is already in `main`. It is not sufficient on its ow
 branch still shows commits `main` "lacks" while being just as spent. The `gh`
 check above is the one that decides.
 
-## Wait for greptile after every push to a PR
+## Wait for greptile on a PR's first push
 
-Greptile reviews each pushed commit. Don't hand the PR back and stop — start a
+Greptile reviews new work — not a push that only fixes comments it already left
+(see the end of this section). Don't hand the PR back and stop — start a
 background watcher keyed to the SHA just pushed, so its exit re-invokes you and
 the findings get addressed in the same session instead of being relayed by hand:
 
@@ -98,7 +99,23 @@ gh api --paginate "repos/{owner}/{repo}/pulls/$pr/comments" --jq '.[] | {path, l
 
 Each finding is a claim, not a verdict — confirm it against the code before
 fixing, and say so in the PR when one is wrong rather than editing to appease it.
-A fix push starts the cycle again; watch that SHA too.
+
+**Don't watch the fix push.** Greptile is configured here to skip re-reviewing a
+push that only addresses existing review comments, so a watcher on that SHA is
+guaranteed to burn 20 minutes and time out. Push the fix, say what it changed,
+and stop — the watcher is for the *first* push of a PR, and for a later push
+that adds new work rather than answering a comment.
+
+A timeout on such a push is therefore expected, not a signal, and the by-hand
+check that follows it has one trap:
+
+- **A line comment's `commit_id` moves.** GitHub re-anchors an open comment onto
+  the newest commit as the diff shifts, so `pulls/<pr>/comments` shows the *old*
+  finding stamped with the *new* SHA and reads exactly like a fresh review of it.
+  `original_commit_id` is the one that doesn't move; the summary comment's "Last
+  reviewed commit" link says the same thing in one line. Check one of those
+  before concluding greptile reviewed a commit — or before re-fixing a finding
+  you already fixed.
 
 ## What this is
 

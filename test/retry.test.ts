@@ -4,7 +4,7 @@
 // indistinguishable. These lock in the two behaviours that fixed it -- the
 // reason survives to the caller, and a terminal reason stops the retrying.
 import { describe, expect, it, vi } from "vitest";
-import { generate, judge, isTerminal, genFailure } from "../src/openai.js";
+import { generate, judge, isTerminal, genFailure, defaultMaxOutputTokens } from "../src/openai.js";
 
 const CFG = { model: "gpt-4o-mini", maxOutputTokens: 400 };
 const QUOTA = JSON.stringify({
@@ -139,6 +139,24 @@ describe("genFailure", () => {
     expect(genFailure({ ...base, status: "completed", response: "an answer" })).toBeNull();
     // salvageable truncation -- scorer.py:199-201 keeps >200 chars
     expect(genFailure({ ...base, status: "incomplete", response: "x".repeat(201) })).toBeNull();
+  });
+});
+
+describe("defaultMaxOutputTokens", () => {
+  // The other half of live_1786494131: genFailure() explains the empty
+  // responses, this stops most of them happening. 400 is a fine answer budget
+  // and a hopeless answer+reasoning budget.
+  it("gives reasoning models room to think and still answer", () => {
+    expect(defaultMaxOutputTokens("gpt-5")).toBeGreaterThan(400);
+    expect(defaultMaxOutputTokens("gpt-5-mini")).toBeGreaterThan(400);
+    expect(defaultMaxOutputTokens("o3-mini")).toBeGreaterThan(400);
+  });
+
+  it("leaves non-reasoning models on runner.py's 400", () => {
+    // Raising these would only widen a cap they never reach -- and the golden
+    // fixtures were recorded at 400.
+    expect(defaultMaxOutputTokens("gpt-4o-mini")).toBe(400);
+    expect(defaultMaxOutputTokens("gpt-4o")).toBe(400);
   });
 });
 
