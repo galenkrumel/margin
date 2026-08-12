@@ -162,6 +162,23 @@ export async function generate(
   return result ?? { status: "error", response: "", inputTokens: 0, outputTokens: 0, searchCalls: 0, cost: 0, error: lastError };
 }
 
+/** Why a generate result is unusable for measurement -- null when it is fine.
+ *
+ * scorer.py:199-201's policy: "completed" with text, or "incomplete" long
+ * enough to salvage. Everything else is a failed call, and the ones that
+ * arrive as an HTTP *200* carry no `error` of their own -- status and
+ * incomplete_details are the only record of why. Dropping them is what made
+ * live_1786494131 report `first failure: unknown` for 9 gpt-5 calls that spent
+ * all 400 of their max_output_tokens on reasoning and emitted no visible text.
+ * Same lesson as the retry reasons above: the reason has to survive the call. */
+export function genFailure(r: GenerateResult): string | null {
+  if (r.error) return r.error;
+  const text = (r.response || "").trim();
+  if (text && (r.status === "completed" || (r.status === "incomplete" && text.length > 200))) return null;
+  const reason = (r.incompleteDetails as { reason?: string } | null | undefined)?.reason;
+  return `${r.status}${reason ? ` (${reason})` : ""} -- ${text.length} chars from ${r.outputTokens} output tokens`;
+}
+
 export interface JudgeResult {
   score: Record<string, unknown> | null;
   judgeCost: number;

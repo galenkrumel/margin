@@ -4,7 +4,7 @@
 // indistinguishable. These lock in the two behaviours that fixed it -- the
 // reason survives to the caller, and a terminal reason stops the retrying.
 import { describe, expect, it, vi } from "vitest";
-import { generate, judge, isTerminal } from "../src/openai.js";
+import { generate, judge, isTerminal, genFailure } from "../src/openai.js";
 
 const CFG = { model: "gpt-4o-mini", maxOutputTokens: 400 };
 const QUOTA = JSON.stringify({
@@ -111,6 +111,34 @@ describe("generate", () => {
     const r = await p;
     vi.useRealTimers();
     expect(r.error).toContain("connection reset");
+  });
+});
+
+describe("genFailure", () => {
+  const base = { response: "", inputTokens: 10, outputTokens: 0, searchCalls: 0, cost: 0, error: null };
+
+  it("names the reason a 200 came back with no usable text", () => {
+    // The live_1786494131 shape: gpt-5 spent all 400 max_output_tokens on
+    // reasoning, so the call succeeded, returned nothing, and carried no
+    // error -- which the job then reported as "first failure: unknown".
+    const why = genFailure({ ...base, status: "incomplete", outputTokens: 384,
+                             incompleteDetails: { reason: "max_output_tokens" } });
+    expect(why).toContain("max_output_tokens");   // the actionable half: raise the cap
+    expect(why).toContain("384");
+    expect(why).not.toBeNull();
+  });
+
+  it("never returns null for a response the run cannot use", () => {
+    // The invariant the "unknown" line depended on: !ok implies a reason.
+    expect(genFailure({ ...base, status: "completed" })).not.toBeNull();          // 200, empty body
+    expect(genFailure({ ...base, status: "incomplete", response: "short" })).not.toBeNull();
+    expect(genFailure({ ...base, status: "error", error: "401: bad key" })).toBe("401: bad key");
+  });
+
+  it("passes the two shapes that are usable", () => {
+    expect(genFailure({ ...base, status: "completed", response: "an answer" })).toBeNull();
+    // salvageable truncation -- scorer.py:199-201 keeps >200 chars
+    expect(genFailure({ ...base, status: "incomplete", response: "x".repeat(201) })).toBeNull();
   });
 });
 
